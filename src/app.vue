@@ -1,13 +1,3 @@
 <template>
-  <vue-router></vue-router>
+  <router-view></router-view>
 </template>
-
-<script>
-export default {
-
-}
-</script>
-
-<style>
-
-</style>

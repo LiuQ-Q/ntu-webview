@@ -3,7 +3,7 @@ import VueRouter from 'vue-router';
 
 Vue.use(VueRouter);
 
-import Home from './pages/home.vue';
+import Home from './pages/Home.vue';
 import SignIn from './pages/SignIn.vue';
 
 export default new VueRouter({
@@ -13,12 +13,15 @@ export default new VueRouter({
       redirect: '/home'
     },
     {
-      path: '/home',
-      component: Home
-    },
-    {
       path: '/signin',
       component: SignIn
+    },
+    {
+      path: '/home',
+      component: Home,
+      children: [
+        
+      ]
     }
   ]
 });

@@ -11,10 +11,10 @@
         v-for="(nav, index) in navs"
         :key="index"
         :href="nav.url"
-        variant="outline-light"
         class="ml-5"
-        style="color:rgba(255, 255, 255, 0.75)"
+        style="color:rgba(255, 255, 255, 0.5)"
       >{{ nav.name }}</b-link>
+
       <b-navbar-nav class="ml-auto" style="float:right;"> 
         <!-- <b-nav-item-dropdown right>
           <template slot="button-content">语言</template>
@@ -38,10 +38,10 @@ export default {
       navs: [
         { name: '总览', url: '#/dashboard' },
         { name: '项目', url: '#/projects' },
-        { name: '组件', url: '#' },
-        { name: '漏洞', url: '#' },
-        { name: '许可证', url: '#' },
-        { name: '关系网', url: '#' }
+        { name: '组件', url: '#/libraries' },
+        { name: '漏洞', url: '#/vulnerabilities' },
+        { name: '许可证', url: '#/licenses' },
+        { name: '关系网', url: '#/knowledge-graph' }
       ]
     }
   }

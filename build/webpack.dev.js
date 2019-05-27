@@ -16,9 +16,10 @@ module.exports = merge(webpackBase, {
       '/api': {
         // target: 'http://52.82.100.75:8000',
         target: 'https://api-staging.scantist.io/v1',
-        // bypass(req, res, proxyOptions) {
-        //   console.log(req, res, proxyOptions)
-        // }
+        changeOrigin:true,
+        pathRewrite:{
+            '^/api':''
+        }
       }
 		},
     host: '0.0.0.0',

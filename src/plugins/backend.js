@@ -20,12 +20,19 @@ export default function install(Vue) {
         session.token = res.data.token;
       });
     },
-    getTeamList() {
-      return api.get('/orgs/', {
+    getIssueList() {
+      return api.get('/issues/', {
         headers: {
           authorization: `Token ${session.token}`
         }
       }).then(res => res.data);
-    }
+    },
+    getTeamList() {
+      return api.get('/teams/', {
+        headers: {
+          authorization: `Token ${session.token}`
+        }
+      }).then(res => res.data);
+    },
   }
 }

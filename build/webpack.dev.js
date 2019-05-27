@@ -11,10 +11,11 @@ module.exports = merge(webpackBase, {
     filename: 'bundle.js'
   },
   devServer: {
-    port: 3001,
+    port: 3000,
     proxy: {
-      '/v1': {
-        target: 'http://52.82.100.75:8000',
+      '/api': {
+        // target: 'http://52.82.100.75:8000',
+        target: 'https://api-staging.scantist.io/v1',
         // bypass(req, res, proxyOptions) {
         //   console.log(req, res, proxyOptions)
         // }

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export default function install(Vue) {
   const api = axios.create({
-    baseURL: '/v1',
+    baseURL: '/api',
     headers: {}
   });
 
@@ -21,7 +21,7 @@ export default function install(Vue) {
       });
     },
     getTeamList() {
-      return api.get('/teams/', {
+      return api.get('/orgs/', {
         headers: {
           authorization: `Token ${session.token}`
         }

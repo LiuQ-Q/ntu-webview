@@ -15,9 +15,13 @@
         { key: 'scan', label: '详情' },
       ]"
       :items="projectItems"
+      class="licenses-by-project"
     >
       <template slot="thead-top">
         <h4>按项目分类</h4>
+      </template>
+      <template slot="project" slot-scope="data">
+        <b-link to="/projects/1">{{ data.item.project }}</b-link>
       </template>
       <template slot="scan">
         <b-link>查看</b-link>
@@ -32,9 +36,10 @@
         { key: 'affect', label: '受影响项目' }
       ]"
       :items='libraryItems'
+      class="licenses-by-library"
     >
       <template slot="thead-top">
-        <h4>按组件分类</h4>
+        <h4>按许可证分类</h4>
       </template>
       <template slot="scan">
         <b-link>查看</b-link>
@@ -51,8 +56,8 @@ export default {
         {}
       ],
       projectItems: [
-        { project: 'binary_test', policy: 5, allow: 20, mark: 0, limit: 2, last: '2天前' },
-        { project: 'binary_test', policy: 5, allow: 20, mark: 0, limit: 2, last: '2天前' },
+        { project: 'binary_test', policy: 'Default', allow: 20, mark: 0, limit: 2, last: '2天前' },
+        { project: 'binary_test', policy: 'Default', allow: 20, mark: 0, limit: 2, last: '2天前' },
       ],
       libraryItems: [
         { num: 'Apache-2.0', style: '获准的', score: 5, affect: 1 },
@@ -90,6 +95,15 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang='less'>
+.licenses-by-project {
+  td {
+    width: 14.3%;
+  } 
+}
+.licenses-by-library {
+  td {
+    width: 25%;
+  }
+}
 </style>

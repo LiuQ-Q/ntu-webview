@@ -27,18 +27,22 @@
       :fields="[
         { key: 'project', label: '项目' },
         { key: 'cve', label: 'CVE' },
-        { key: 'bug', label: '安全隐患(Bug)' },
+        { key: 'bug', label: 'Bug' },
         { key: 'warn', label: '安全警告' },
         { key: 'last', label: '最后扫描' },
         { key: 'scan', label: '情况' },
       ]"
       :items="projectItems"
+      class="vulnerabilities-by-project"
     >
       <template slot="thead-top">
-        <h4>按项目分类</h4>
+        <h4>按漏洞分类</h4>
+      </template>
+      <template slot="project" slot-scope="data">
+        <b-link to="/projects/1">{{ data.item.project }}</b-link>
       </template>
       <template slot="scan">
-        <b-link>查看</b-link>
+        <b-link to="/projects/1/vulnerabilities/1">查看</b-link>
       </template>
     </b-table>
 
@@ -50,6 +54,7 @@
         { key: 'affect', label: '受影响项目' }
       ]"
       :items='libraryItems'
+      class="vulnerabilities-by-library"
     >
       <template slot="thead-top">
         <h4>按组件分类</h4>
@@ -112,6 +117,16 @@ export default {
 .vulnerabilities-overview {
   td {
     width: 33.33%;
+  }
+}
+.vulnerabilities-by-project {
+  td {
+    width: 16.66%;
+  }
+}
+.vulnerabilities-by-library {
+  td {
+    width: 25%;
   }
 }
 </style>

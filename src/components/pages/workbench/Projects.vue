@@ -46,16 +46,16 @@
         </tr>  
       </template>
       <template slot="name" slot-scope="data">
-        <b-link>{{ data.item.name }}</b-link>
+        <b-link to="/projects/1">{{ data.item.name }}</b-link>
       </template>
       <template slot="libraries">
-        <b-link>查看</b-link>
+        <b-link to="/projects/1/libraries/1">查看</b-link>
       </template>
       <template slot="vulnerabilities">
-        <b-link>查看</b-link>
+        <b-link to="/projects/1/vulnerabilities/1">查看</b-link>
       </template>
       <template slot="licenses">
-        <b-link>查看</b-link>
+        <b-link to="/projects/1/licenses/1">查看</b-link>
       </template>
       <template slot="manage">
         <b-link>查看</b-link>

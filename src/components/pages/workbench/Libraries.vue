@@ -35,12 +35,16 @@
         { key: 'scan', label: '情况' },
       ]"
       :items="projectItems"
+      class="libraries-by-project"
     >
       <template slot="thead-top">
         <h4>按项目分类</h4>
       </template>
+      <template slot="project" slot-scope="data">
+        <b-link to="/projects/1">{{ data.item.project }}</b-link>
+      </template>
       <template slot="scan">
-        <b-link>查看</b-link>
+        <b-link to="/projects/1/libraries/1">查看</b-link>
       </template>
     </b-table>
 
@@ -54,6 +58,7 @@
         { key: 'affect', label: '受影响项目' }
       ]"
       :items='libraryItems'
+      class="libraries-by-library"
     >
       <template slot="thead-top">
         <h4>按组件分类</h4>
@@ -118,6 +123,16 @@ export default {
 .libraries-overview {
   td {
     width: 33.33%;
+  }
+}
+.libraries-by-project {
+  td {
+    width: 16.66%;
+  }
+}
+.libraries-by-library {
+  td {
+    width: 16.66%;
   }
 }
 </style>

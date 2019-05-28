@@ -3,25 +3,6 @@
     <div class="mb-5">
       <h1>总览</h1>
     </div>
-    <!-- <div>
-      <b-card
-        v-for="(item, index) in items"
-        :key="index"
-        style="float:left;width:23%;margin:1%;"
-        class="my-4"
-      ><h4><a href="">{{ item.title }}</a></h4>{{ item.abstract }}</b-card>
-    </div>
-    <div>
-      <b-card style="float:left;width:31.33%;margin:1%;">
-        <highcharts :options="options" :styles="style" ref="simpleChart"></highcharts>
-      </b-card>
-      <b-card style="float:left;width:31.33%;margin:1%;">
-        <highcharts :options="options" :styles="style" ref="simpleChart"></highcharts>          
-      </b-card>
-      <b-card style="float:left;width:31.33%;margin:1%;">
-        <highcharts :options="options" :styles="style" ref="simpleChart"></highcharts>          
-      </b-card>
-    </div> -->
     <b-table
       :fields="[
         { key: 'agency', label: '机构' },
@@ -34,13 +15,13 @@
       class="dashboard-overview text-center"
     >
       <template slot="project" slot-scope="data">
-        <b-link>{{ data.item.project }}</b-link>
+        <b-link to="/projects">{{ data.item.project }}</b-link>
       </template>
       <template slot="user" slot-scope="data">
-        <b-link>{{ data.item.user }}</b-link>
+        <b-link to="/settings">{{ data.item.user }}</b-link>
       </template>
       <template slot="scan" slot-scope="data">
-        <b-link>{{ data.item.scan }}</b-link>
+        <b-link to="/projects">{{ data.item.scan }}</b-link>
       </template>
     </b-table>
 
@@ -69,7 +50,7 @@
           :items='items'
         >
           <template slot="name">
-            <b-link>binary-test</b-link>
+            <b-link to='/projects/1'>binary-test</b-link>
           </template>
           <template slot="lang">-</template>
           <template slot="problem">0</template>
@@ -86,7 +67,7 @@
           :items='items'
         >
           <template slot="name">
-            <b-link>binary-test</b-link>
+            <b-link to='/projects/1'>binary-test</b-link>
           </template>
           <template slot="lang">-</template>
           <template slot="problem">0</template>
@@ -103,7 +84,7 @@
           :items='items'
         >
           <template slot="name">
-            <b-link>binary-test</b-link>
+            <b-link to='/projects/1'>binary-test</b-link>
           </template>
           <template slot="lang">-</template>
           <template slot="problem">0</template>

@@ -21,16 +21,4 @@ export default {
   #content {
     padding-top: 20px;
   }
-  .modal-header {
-    .modal-title {
-      float: left;
-    }
-
-    &:after {
-      content: '';
-      display: block;
-      clear: both;
-      visibility: hidden;
-    }
-  }
 </style>

@@ -45,7 +45,10 @@
           <th colspan="5">&nbsp;</th>
         </tr>  
       </template>
-      <template slot="name" slot-scope="data">
+      <template 
+        slot="name" 
+        slot-scope="data"
+      >
         <b-link to="/projects/1">{{ data.item.name }}</b-link>
       </template>
       <template slot="libraries">
@@ -57,8 +60,31 @@
       <template slot="licenses">
         <b-link to="/projects/1/licenses/1">查看</b-link>
       </template>
-      <template slot="manage">
-        <b-link>开始扫描</b-link>
+      <template 
+        slot="manage" 
+        slot-scope="data"
+      >
+        <b-link @click="$bvModal.show(`modalaa-scan-${data.item.name}`)">开始扫描</b-link>
+
+        <b-modal 
+          :id="`modalaa-scan-${data.item.name}`"
+          hide-footer
+        >
+          <template slot="modal-title">扫描设置</template>
+
+          <p>项目名:&nbsp;{{ data.item.name }}</p>
+
+          <b-form-select
+            v-model="scanSetting"
+            size='sm'
+            class="mb-2"
+          >
+            <option value="source">源代码</option>
+            <option value="binary">二进制</option>
+          </b-form-select>
+
+          <b-button class="mt-3" block>开始扫描</b-button>
+        </b-modal>
       </template>
     </b-table>
   </b-container>
@@ -110,7 +136,8 @@ export default {
           last_update: '4天前',
           status: '未扫描',
         },
-      ]
+      ],
+      scanSetting: ''
     }
   }
 }

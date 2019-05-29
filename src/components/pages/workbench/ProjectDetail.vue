@@ -123,6 +123,19 @@
       class="text-center"
       small
     >
+      <template slot="thead-top">
+        <tr>
+          <th>
+            <h5>扫描历史</h5>
+          </th>
+          <th colspan="9">&nbsp;</th>
+          <th>
+            <b-button 
+              to="/projects/1/compare"
+            >比较</b-button>
+          </th>
+        </tr>  
+      </template>
       <template 
         slot="status" 
         slot-scope="data"
@@ -149,8 +162,12 @@
         <b-link to="/projects/1/licenses/1">查看</b-link>
       </template>
 
-      <template slot="check">
-        <b-check></b-check>
+      <template slot="check" slot-scope="data">
+        <b-check
+          v-model="projectSelected"
+          :value="data.item.id"
+          :disabled="projectSelected.length > 4 ? true : false"
+        ></b-check>
       </template>
 
       <template slot="report">
@@ -199,13 +216,41 @@ export default {
           time: '2天前',
           cost: '00:50',
           log: 'ccccccccccccccccccccccccccccccccccccccccccccccccc'
-        }
+        },
+        {
+          id: '#14',
+          source: 'Web',
+          branch: 'aaa-aaaa.zip',
+          status: '完成',
+          time: '2天前',
+          cost: '00:50',
+          log: 'ccccccccccccccccccccccccccccccccccccccccccccccccc'
+        },
+        {
+          id: '#15',
+          source: 'Web',
+          branch: 'aaa-aaaa.zip',
+          status: '完成',
+          time: '2天前',
+          cost: '00:50',
+          log: 'ccccccccccccccccccccccccccccccccccccccccccccccccc'
+        },
+        {
+          id: '#16',
+          source: 'Web',
+          branch: 'aaa-aaaa.zip',
+          status: '完成',
+          time: '2天前',
+          cost: '00:50',
+          log: 'ccccccccccccccccccccccccccccccccccccccccccccccccc'
+        },
       ],
       file: null,
       regularScan: false,
       regularScanStyle: 'source',
       driveScanStyle: 'pull',
-      licensePolicy: 'default'
+      licensePolicy: 'default',
+      projectSelected: []
     }
   }
 }

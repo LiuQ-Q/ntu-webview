@@ -40,7 +40,7 @@
         <p>已使用二进制流量</p>
       </template>
       <template slot="project">
-        <highcharts :options="options" :styles="style"></highcharts>
+        <highcharts :options="options"></highcharts>
         <b-table
           :fields="[
             { key: 'name', label: '名称' },
@@ -57,7 +57,7 @@
         </b-table>
       </template>
       <template slot="vulnerabilities">
-        <highcharts :options="options" :styles="style"></highcharts>
+        <highcharts :options="options"></highcharts>
         <b-table
           :fields="[
             { key: 'name', label: '名称' },
@@ -74,7 +74,7 @@
         </b-table>
       </template>
       <template slot="licenses">
-        <highcharts :options="options" :styles="style"></highcharts>
+        <highcharts :options="options"></highcharts>
         <b-table
           :fields="[
             { key: 'name', label: '名称' },
@@ -124,10 +124,6 @@ export default {
         pie: {
           showInLegend: true
         }
-      },
-      style: {
-        height: 300,
-        width: 300,
       }
     }
   }

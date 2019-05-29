@@ -14,8 +14,9 @@ import Licenses from './components/pages/workbench/Licenses.vue';
 import Settings from './components/pages/workbench/Settings.vue';
 import CreateOrg from './components/pages/workbench/CreateOrg.vue';
 
-import ProjectDetail from './components/pages/workbench/ProjectDetail.vue';
 import ProjectManage from './components/pages/workbench/ProjectsManage.vue';
+import ProjectDetail from './components/pages/workbench/ProjectDetail.vue';
+import ProjectCompare from './components/pages/workbench/ProjectsCompare.vue'
 import LibraryResult from './components/pages/workbench/LibraryResult.vue';
 import LibraryDetail from './components/pages/workbench/LibraryDetail.vue';
 import VulnerabilityResult from './components/pages/workbench/VulnerabilityResult.vue';
@@ -113,6 +114,10 @@ export default new VueRouter({
         {
           path: '/projects/:projectId',
           component: ProjectDetail
+        },
+        {
+          path: '/projects/:projectId/compare',
+          component: ProjectCompare
         },
         {
           path: '/projects/:projectId/libraries/:libraryId',

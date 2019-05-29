@@ -29,7 +29,7 @@ export default {
       
       // this.$el.style.width = (this.styles.width || 800) + 'px';
       // this.$el.style.height = (this.styles.height || 400) + 'px';
-      this.$el.style.minWidth = this.styles.minWidth;
+      // this.$el.style.minWidth = this.styles.minWidth ? this.styles.minWidth : '' ;
       this.chart = new Highcharts.Chart(this.$el, this.options);
     }
   },

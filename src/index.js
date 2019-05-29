@@ -11,6 +11,8 @@ Vue.use(BootstrapVue);
 Vue.use(backend);
 Vue.use(highcharts);
 
+import './assets/css/main.less';
+
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'classlist-polyfill';

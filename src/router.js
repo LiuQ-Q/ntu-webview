@@ -15,8 +15,12 @@ import Settings from './components/pages/workbench/Settings.vue';
 import CreateOrg from './components/pages/workbench/CreateOrg.vue';
 
 import ProjectDetail from './components/pages/workbench/ProjectDetail.vue';
+import ProjectManage from './components/pages/workbench/ProjectsManage.vue';
+import LibraryResult from './components/pages/workbench/LibraryResult.vue';
 import LibraryDetail from './components/pages/workbench/LibraryDetail.vue';
+import VulnerabilityResult from './components/pages/workbench/VulnerabilityResult.vue';
 import VulnerabilityDetail from './components/pages/workbench/VulnerabilityDetail.vue';
+import LicenseResult from './components/pages/workbench/LicenseResult.vue';
 import LicenseDetail from './components/pages/workbench/LicenseDetail.vue';
 
 import Organizations from './components/pages/workbench/settings/Organizations.vue';
@@ -65,6 +69,10 @@ export default new VueRouter({
           component: Licenses
         },
         {
+          path: '/manage',
+          component: ProjectManage
+        },
+        {
           path: '/settings',
           component: Settings,
           children: [
@@ -108,14 +116,26 @@ export default new VueRouter({
         },
         {
           path: '/projects/:projectId/libraries/:libraryId',
+          component: LibraryResult
+        },
+        {
+          path: '/projects/:projectId/libraries/:libraryId/issue/:issueId',
           component: LibraryDetail
         },
         {
           path: '/projects/:projectId/vulnerabilities/:vulnerabilityId',
+          component: VulnerabilityResult
+        },
+        {
+          path: '/projects/:projectId/vulnerabilities/:vulnerabilityId/issue/:issueId',
           component: VulnerabilityDetail
         },
         {
           path: '/projects/:projectId/licenses/:licenseId',
+          component: LicenseResult
+        },
+        {
+          path: '/projects/:projectId/licenses/:licenseId/issue/:issueId',
           component: LicenseDetail
         },
       ]

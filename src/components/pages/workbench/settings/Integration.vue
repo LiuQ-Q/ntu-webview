@@ -9,7 +9,26 @@
       ]"
     >
       <template slot="action">
-        <b-link>创建</b-link>
+        <b-link @click="$bvModal.show('create-integration')">创建</b-link>
+
+        <b-modal 
+          id="create-integration"
+          hide-footer
+        >
+          <template slot="modal-title">创建JIRA集成</template>
+          <b-form>
+            <p>类型:&nbsp;JIRA</p>
+            <b-form-group label="服务器URL:">
+              <b-form-input></b-form-input>
+            </b-form-group>
+          </b-form>
+
+          <b-button 
+            class="mt-3" 
+            block
+            @click="creatIntegration"
+          >创建</b-button>
+        </b-modal>
       </template>
     </b-table>
   </div>
@@ -22,6 +41,11 @@ export default {
       items: [
         { name: 'JIRA', status: '未连接' }
       ]
+    }
+  },
+  methods: {
+    creatIntegration() {
+
     }
   }
 }

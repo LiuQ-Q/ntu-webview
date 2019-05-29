@@ -3,7 +3,7 @@
     style="width:50%;" 
     class="mt-3"
   >
-    <b-form class="signin-form">
+    <b-form>
       <b-form-group label="机构名称:">
         <b-form-input 
           value="test1"
@@ -12,7 +12,11 @@
       </b-form-group>
 
       <b-form-group label="简介:">
-        <b-form-input value="Default organization for test1"></b-form-input>
+        <b-form-textarea
+          rows="3"
+          max-rows="6"
+          value="Default organization for test1"
+        ></b-form-textarea>
       </b-form-group>
     </b-form>
   </div>

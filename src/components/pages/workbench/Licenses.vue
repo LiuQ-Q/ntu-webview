@@ -24,7 +24,7 @@
         <b-link to="/projects/1">{{ data.item.project }}</b-link>
       </template>
       <template slot="scan">
-        <b-link>查看</b-link>
+        <b-link to="/projects/1/licenses/1">查看</b-link>
       </template>
     </b-table>
 
@@ -40,9 +40,6 @@
     >
       <template slot="thead-top">
         <h4>按许可证分类</h4>
-      </template>
-      <template slot="scan">
-        <b-link>查看</b-link>
       </template>
     </b-table>
   </b-container>

@@ -1,22 +1,29 @@
 <template>
   <b-container>
     <div class="mb-5">
-      <h1>项目</h1>
+      <h1>组件扫描结果</h1>
     </div>
 
     <b-table
       :fields="[
-        { key: 'libraries', label: '概览' },
+        { key: 'libraries', label: '统计' },
         { key: 'vulnerabilities', label: '漏洞' },
+        { key: 'licenses', label: '许可证' },
       ]" 
       :items='items'
-      class="projects-overview"
+      class="library-result-overview"
     >
       <template slot="libraries">
-        <p>项目总数</p>
-        <p>已使用二进制流量</p>
+        <p>组件数量</p>
+        <p>已发现漏洞</p>
+        <p>存在问题的许可证</p>
       </template>
+
       <template slot="vulnerabilities">
+        <highcharts :options="options" :styles="style"></highcharts>
+      </template>
+
+      <template slot="licenses">
         <highcharts :options="options" :styles="style"></highcharts>
       </template>
     </b-table>
@@ -24,41 +31,24 @@
     <b-table 
       :fields="[
         {key: 'name', label: '名称'},
-        {key: 'last_update', label: '最后更新'},
-        {key: 'status', label: '扫描状态'},
-        {key: 'libraries', label: '组件'},
+        {key: 'version', label: '版本'},
+        {key: 'module', label: '模组'},
         {key: 'vulnerabilities', label: '漏洞'},
         {key: 'licenses', label: '许可证'},
-        {key: 'manage', label: '操作'},
+        {key: 'detail', label: '详情'},
       ]" 
-      :items='projectsItems'
-      class="text-center"
+      :items='librariesItems'
     >
       <template slot="thead-top">
         <tr>
           <th>
-            <h4>项目列表</h4>
+            <h5>组件清单</h5>
           </th>
-          <th>
-            <b-button to="/manage">添加项目</b-button>
-          </th>
-          <th colspan="5">&nbsp;</th>
+          <th colspan="5"></th>
         </tr>  
       </template>
-      <template slot="name" slot-scope="data">
-        <b-link to="/projects/1">{{ data.item.name }}</b-link>
-      </template>
-      <template slot="libraries">
-        <b-link to="/projects/1/libraries/1">查看</b-link>
-      </template>
-      <template slot="vulnerabilities">
-        <b-link to="/projects/1/vulnerabilities/1">查看</b-link>
-      </template>
-      <template slot="licenses">
-        <b-link to="/projects/1/licenses/1">查看</b-link>
-      </template>
-      <template slot="manage">
-        <b-link>开始扫描</b-link>
+      <template slot="detail">
+        <b-link to="/projects/1/libraries/1/issue/1">查看</b-link>
       </template>
     </b-table>
   </b-container>
@@ -99,27 +89,31 @@ export default {
       items: [
         {}
       ],
-      projectsItems: [
+      librariesItems: [
         {
-          name: 'war_test',
-          last_update: '2天前',
-          status: '未扫描',
+          name: 'aaaaa',
+          version: '1.1.1',
+          module: 'a.elf',
+          vulnerabilities: '10',
+          licenses: 'LGPL-2.1-or-later'
         },
         {
-          name: 'binary_test',
-          last_update: '4天前',
-          status: '未扫描',
-        },
+          name: 'bbbbb',
+          version: '2.2.2',
+          module: 'bbb',
+          vulnerabilities: '15',
+          licenses: 'LGPL-2.1-or-later'
+        }
       ]
     }
   }
 }
 </script>
 
-<style lang='less'>
-.projects-overview {
+<style lang="less">
+.library-result-overview {
   td {
-    width: 50%;
+    width: 33.33%;
   }
 }
 </style>

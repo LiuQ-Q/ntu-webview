@@ -8,6 +8,7 @@
         { key: 'all', label: '总览' },
         { key: 'cve', label: 'CVE' },
         { key: 'bug', label: 'Bug' },
+        { key: 'warn', label: '警告' },
       ]" 
       :items='items'
       class="vulnerabilities-overview text-center"
@@ -15,11 +16,17 @@
       <template slot="all">
         <highcharts :options="options" :styles="style"></highcharts>
       </template>
+
       <template slot="cve">
         <highcharts :options="options" :styles="style"></highcharts>
       </template>
+
       <template slot="bug">
         <highcharts :options="options" :styles="style"></highcharts>
+      </template>
+
+      <template slot="warn">
+        <p>未发现问题</p>
       </template>
     </b-table>
 
@@ -116,7 +123,7 @@ export default {
 <style lang='less'>
 .vulnerabilities-overview {
   td {
-    width: 33.33%;
+    width: 25%;
   }
 }
 .vulnerabilities-by-project {

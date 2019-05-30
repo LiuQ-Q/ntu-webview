@@ -3,7 +3,7 @@ import VueRouter from 'vue-router';
 
 Vue.use(VueRouter);
 
-import SignIn from './components/pages/SignIn.vue';
+import LogIn from './components/pages/LogIn.vue';
 import Home from './components/pages/workbench.vue';
 
 import DashBoard from './components/pages/workbench/DashBoard.vue';
@@ -38,8 +38,8 @@ export default new VueRouter({
       redirect: '/home'
     },
     {
-      path: '/signin',
-      component: SignIn
+      path: '/login',
+      component: LogIn
     },
     {
       path: '/home',

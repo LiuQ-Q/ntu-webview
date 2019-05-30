@@ -13,13 +13,13 @@ module.exports = merge(webpackBase, {
   devServer: {
     port: 3000,
     proxy: {
-      '/api': {
-        // target: 'http://52.82.100.75:8000',
-        target: 'https://api-staging.scantist.io/v1',
-        changeOrigin:true,
-        pathRewrite:{
-            '^/api':''
-        }
+      '/v1': {
+        target: 'http://52.82.100.75:8000',
+        // target: 'https://api-staging.scantist.io',
+        // changeOrigin:true,
+        // pathRewrite:{
+        //     '^/api':''
+        // }
       }
 		},
     host: '0.0.0.0',

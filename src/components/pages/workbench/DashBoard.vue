@@ -44,7 +44,6 @@
         <b-table
           :fields="[
             { key: 'name', label: '名称' },
-            { key: 'lang', label: '语言' },
             { key: 'problem', label: '问题' },
           ]" 
           :items='items'
@@ -52,7 +51,6 @@
           <template slot="name">
             <b-link to='/projects/1'>binary-test</b-link>
           </template>
-          <template slot="lang">-</template>
           <template slot="problem">0</template>
         </b-table>
       </template>
@@ -61,7 +59,6 @@
         <b-table
           :fields="[
             { key: 'name', label: '名称' },
-            { key: 'lang', label: '语言' },
             { key: 'problem', label: '问题' },
           ]" 
           :items='items'
@@ -69,7 +66,6 @@
           <template slot="name">
             <b-link to='/projects/1'>binary-test</b-link>
           </template>
-          <template slot="lang">-</template>
           <template slot="problem">0</template>
         </b-table>
       </template>
@@ -78,7 +74,6 @@
         <b-table
           :fields="[
             { key: 'name', label: '名称' },
-            { key: 'lang', label: '语言' },
             { key: 'problem', label: '问题' },
           ]" 
           :items='items'
@@ -86,7 +81,6 @@
           <template slot="name">
             <b-link to='/projects/1'>binary-test</b-link>
           </template>
-          <template slot="lang">-</template>
           <template slot="problem">0</template>
         </b-table>
       </template>
@@ -99,7 +93,7 @@ export default {
   data() {
     return {
       items: [
-        {agency: 'test1', project: '2/25', user: '1/25', scan: '0/999'}
+        {agency: 'test1', project: '2/25', user: '1/25', scan: '0/9999'}
       ],
       options: {
         chart: {

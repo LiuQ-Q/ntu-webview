@@ -57,7 +57,17 @@ export default {
         { name: '漏洞', url: '#/vulnerabilities' },
         { name: '许可证', url: '#/licenses' },
         { name: '关系网', url: '#/knowledge-graph' }
-      ]
+      ],
+      orgList: []
+    }
+  },
+  mounted() {
+    this.getOrgList();
+  },
+  methods: {
+    async getOrgList() {
+      this.orgList = (await this.$backend.orgs.getList()).result;
+      console.log(this.orgList);
     }
   }
 }

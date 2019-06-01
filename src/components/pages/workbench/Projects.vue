@@ -154,9 +154,6 @@ export default {
   data() {
     return {
       orgId: this.$route.params.orgId,
-      items: [
-        {}
-      ],
       projectStatus: {
         'never_scanned': '未扫描',
         'outdated': '未更新',

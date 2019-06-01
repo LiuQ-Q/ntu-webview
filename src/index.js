@@ -18,6 +18,8 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'classlist-polyfill';
 import 'js-polyfills/html';
 
+
+
 new Vue({
   router,
   store,

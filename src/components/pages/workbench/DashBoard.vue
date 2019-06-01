@@ -3,6 +3,7 @@
     <div class="mb-5">
       <h1>总览</h1>
     </div>
+    
     <b-table
       :fields="[
         { key: 'agency', label: '机构' },
@@ -10,18 +11,19 @@
         { key: 'user', label: '用户' },
         { key: 'scan', label: '扫描' },
       ]" 
-      :items='items'
+      :items="[{}]"
       bordered
       class="dashboard-overview text-center"
     >
+      <template slot="agency" slot-scope="data">{{ orgName }}</template>
       <template slot="project" slot-scope="data">
-        <b-link to="/projects">{{ data.item.project }}</b-link>
+        <b-link to="projects">{{ projectList.count }}/{{ sourcecodeUsage['project_number_limit'] }}</b-link>
       </template>
       <template slot="user" slot-scope="data">
-        <b-link to="/settings">{{ data.item.user }}</b-link>
+        <b-link to="settings">{{ memberList.count }}/{{ sourcecodeUsage['member_number_limit'] }}</b-link>
       </template>
       <template slot="scan" slot-scope="data">
-        <b-link to="/projects">{{ data.item.scan }}</b-link>
+        <b-link to="projects">0/{{ sourcecodeUsage['monthly_scan_limit'] }}</b-link>
       </template>
     </b-table>
 
@@ -31,57 +33,141 @@
         { key: 'vulnerabilities', label: '漏洞警报' },
         { key: 'licenses', label: '许可证警报' },
       ]" 
-      :items='items'
+      :items="[{}]"
       bordered
       class="dashboard-alarm text-center mt-5"
     >
-      <template slot="libraries">
-        <p>项目总数</p>
-        <p>已使用二进制流量</p>
-      </template>
+      <!-- 项目情况 -->
       <template slot="project">
-        <highcharts :options="options"></highcharts>
+        <highcharts :options="{
+          chart: {
+            type: 'pie'
+          },
+          title: {
+            text: null
+          },
+          plotOptions: {
+            pie: {
+              showInLegend: true
+            }
+          },
+          series: [{
+            data: [
+              ['未扫描', projectsOverview['never-scanned']],
+              ['未更新', projectsOverview['outdated']],
+              ['已更新', projectsOverview['up-to-date']]
+            ]
+          }],
+          pie: {
+            showInLegend: true
+          }
+        }"></highcharts>
         <b-table
           :fields="[
             { key: 'name', label: '名称' },
-            { key: 'problem', label: '问题' },
+            { key: 'status', label: '状态' },
           ]" 
-          :items='items'
+          :items='projectList.results'
         >
-          <template slot="name">
-            <b-link to='/projects/1'>binary-test</b-link>
+          <template slot="name" slot-scope="data">
+            <b-link :to="`projects/${data.item.id}`">{{ data.item.name }}</b-link>
           </template>
-          <template slot="problem">0</template>
+          <template slot="status" slot-scope="data">{{ projectStatus[data.item.status] }}</template>
         </b-table>
       </template>
+      <!-- 漏洞警报 -->
       <template slot="vulnerabilities">
-        <highcharts :options="options"></highcharts>
+        <highcharts :options="{
+          chart: {
+            type: 'pie'
+          },
+          title: {
+            text: null
+          },
+          plotOptions: {
+            pie: {
+              showInLegend: true
+            }
+          },
+          series: [{
+            data: [
+              ['超高风险', issuesCount['critical']],
+              ['高风险', issuesCount['high']],
+              ['中等风险', issuesCount['medium']],
+              ['低风险', issuesCount['low']],
+              ['未知', issuesCount['none']],
+            ]
+          }],
+          pie: {
+            showInLegend: true
+          }
+        }"></highcharts>
+
         <b-table
           :fields="[
             { key: 'name', label: '名称' },
             { key: 'problem', label: '问题' },
           ]" 
-          :items='items'
+          :items='latestCompletedScan'
         >
-          <template slot="name">
-            <b-link to='/projects/1'>binary-test</b-link>
+          <template 
+            slot="name" 
+            slot-scope="data"
+          >
+            <b-link :to="`projects/${data.item.project}`">{{ data.item['project_name'] }}</b-link>
           </template>
-          <template slot="problem">0</template>
+
+          <template 
+            slot="problem"
+            slot-scope="data"
+          >{{ data.item['scan_issues_count'] }}</template>
         </b-table>
       </template>
+      <!-- 许可证警报 -->
       <template slot="licenses">
-        <highcharts :options="options"></highcharts>
+        <highcharts :options="{
+          chart: {
+            type: 'pie'
+          },
+          title: {
+            text: null
+          },
+          plotOptions: {
+            pie: {
+              showInLegend: true
+            }
+          },
+          series: [{
+            data: [
+              ['未定义的', licensesOverview['not_in_rules']],
+              ['受限的', licensesOverview['deny']],
+              ['被标记的', licensesOverview['flag']],
+              ['被允许的', licensesOverview['approve']],
+            ]
+          }],
+          pie: {
+            showInLegend: true
+          }
+        }"></highcharts>
+
         <b-table
           :fields="[
             { key: 'name', label: '名称' },
             { key: 'problem', label: '问题' },
           ]" 
-          :items='items'
+          :items='latestCompletedScan'
         >
-          <template slot="name">
-            <b-link to='/projects/1'>binary-test</b-link>
+          <template 
+            slot="name" 
+            slot-scope="data"
+          >
+            <b-link :to="`projects/${data.item.project}`">{{ data.item['project_name'] }}</b-link>
           </template>
-          <template slot="problem">0</template>
+
+          <template 
+            slot="problem"
+            slot-scope="data"
+          >{{ data.item['license_issues_count'] }}</template>
         </b-table>
       </template>
     </b-table>
@@ -92,34 +178,73 @@
 export default {
   data() {
     return {
-      items: [
-        {agency: 'test1', project: '2/25', user: '1/25', scan: '0/9999'}
-      ],
-      options: {
-        chart: {
-          type: 'pie'
-        },
-        title: {
-          text: null
-        },
-        plotOptions: {
-          pie: {
-            shadow: false,
-            showInLegend: true
-          }
-        },
-        series: [{
-          data: [
-            ['未扫描', 2],
-            ['未更新', 0],
-            ['已更新', 3]
-          ]
-        }],
-        pie: {
-          showInLegend: true
-        }
-      }
+      orgId: this.$route.params.orgId,
+      orgName: '',
+      sourcecodeUsage: {},
+      projectStatus: {
+        'never_scanned': '未扫描',
+        'outdated': '未更新',
+        'up_to_date': '已更新',
+      },
+      projectsOverview: {},
+      projectList: {},
+      latestCompletedScan: [],
+      issuesCount: {
+        none: 0,
+        medium: 0,
+        low: 0,
+        high: 0,
+        critical: 0
+      },
+      memberList: {},
+      licensesOverview: {}
     }
+  },
+  mounted() {
+    this.getProjectsOverview();
+    this.getProjectList();
+    this.getIssuesSummary();
+    this.getMemberList();
+    this.getLicensesOverview();
+    this.getSourcecodeUsage();
+    this.getOrgById();
+  },
+  methods: {
+    async getProjectsOverview() {
+      this.projectsOverview = await this.$backend.orgs.projects.getList(this.orgId, 'overview');
+    },
+    async getProjectList() {
+      this.projectList = await this.$backend.orgs.projects.getList(this.orgId);
+
+      this.projectList.results.forEach((result, index) => {
+        if (result.latestCompletedScan) {
+          this.latestCompletedScan.push(result.latestCompletedScan);
+        }
+      });
+    },
+    async getIssuesSummary() {
+      const issuesSummary = await this.$backend.orgs.issues.getList(this.orgId, 'issue-summary');
+      
+      Object.keys(issuesSummary).forEach((key) => {
+        this.issuesCount.none += issuesSummary[key].none;
+        this.issuesCount.medium += issuesSummary[key].medium;
+        this.issuesCount.low += issuesSummary[key].low;
+        this.issuesCount.high += issuesSummary[key].high;
+        this.issuesCount.critical += issuesSummary[key].critical;
+      });
+    },
+    async getMemberList() {
+      this.memberList = await this.$backend.orgs.members.getList(this.orgId);
+    },
+    async getLicensesOverview() {
+      this.licensesOverview = await this.$backend.orgs.licenses.getList(this.orgId, 'overview');
+    },
+    async getSourcecodeUsage() {
+      this.sourcecodeUsage = (await this.$backend.orgs.sourcecodeUsage.getList(this.orgId)).results[0];
+    },
+    async getOrgById() {
+      this.orgName = (await this.$backend.orgs.getById(this.$route.params.orgId)).name;
+    },
   }
 }
 </script>

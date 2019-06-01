@@ -9,15 +9,41 @@
         { key: 'libraries', label: '概览' },
         { key: 'vulnerabilities', label: '漏洞' },
       ]" 
-      :items='items'
+      :items="[{}]"
       class="projects-overview"
     >
       <template slot="libraries">
-        <p>项目总数</p>
-        <p>已使用二进制流量</p>
+        <p>项目总数:&nbsp;{{ projectList.count }}</p>
+        <p>已更新:&nbsp;{{ projectsOverview['up-to-date'] }}</p>
+        <p>未更新:&nbsp;{{ projectsOverview['outdated'] }}</p>
+        <p>未扫描:&nbsp;{{ projectsOverview['never-scanned'] }}</p>
+        <p>已使用二进制流量:&nbsp;{{ Math.round(binaryUsage['block_size_scanned'] * 100) / 100 }}MB&nbsp;/&nbsp;{{ Math.round((binaryUsage['block_size_limit'] / 1024) * 100) / 100 }}GB</p>
       </template>
+
       <template slot="vulnerabilities">
-        <highcharts :options="options" :styles="style"></highcharts>
+        <highcharts :options="{
+          chart: {
+            type: 'pie'
+          },
+          title: {
+            text: null
+          },
+          plotOptions: {
+            pie: {
+              showInLegend: true
+            }
+          },
+          series: [{
+            data: [
+              ['未扫描', projectsOverview['never-scanned']],
+              ['未更新', projectsOverview['outdated']],
+              ['已更新', projectsOverview['up-to-date']]
+            ]
+          }],
+          pie: {
+            showInLegend: true
+          }
+        }"></highcharts>
       </template>
     </b-table>
 
@@ -31,7 +57,7 @@
         {key: 'licenses', label: '许可证'},
         {key: 'manage', label: '操作'},
       ]" 
-      :items='projectsItems'
+      :items="projectList.results"
       class="text-center"
     >
       <template slot="thead-top">
@@ -40,26 +66,55 @@
             <h4>项目列表</h4>
           </th>
           <th>
-            <b-button to="/manage">添加项目</b-button>
+            <b-button to="manage">添加项目</b-button>
           </th>
           <th colspan="5">&nbsp;</th>
         </tr>  
       </template>
+
       <template 
         slot="name" 
         slot-scope="data"
       >
-        <b-link to="/projects/1">{{ data.item.name }}</b-link>
+        <b-link :to="`projects/${data.item.id}`">{{ data.item.name }}</b-link>
       </template>
-      <template slot="libraries">
-        <b-link to="/projects/1/libraries/1">查看</b-link>
+
+      <template 
+        slot="last_update"
+        slot-scope="data"
+      >{{ Math.round((Date.now() - Date.parse(data.item['modified'])) / (1000 * 60 * 60 *24)) }}&nbsp;天前</template>
+
+      <template 
+        slot="status"
+        slot-scope="data"
+      >{{ projectStatus[data.item.status] }}</template>
+
+      <template 
+        slot="libraries"
+        slot-scope="data"
+      >
+        <b-link 
+          :to="`projects/${data.item.id}/libraries/${data.item.lastScan ? data.item.lastScan.id : ''}`"
+        >{{ data.item.lastScan ? (data.item.lastScan.status === 'finished' ? '查看' : '') : '' }}</b-link>
       </template>
-      <template slot="vulnerabilities">
-        <b-link to="/projects/1/vulnerabilities/1">查看</b-link>
+
+      <template slot="vulnerabilities" slot-scope="data">
+        <b-link 
+          v-if="(data.item.lastScan ? (data.item.lastScan.status === 'finished') : false)"
+          :to="`projects/${data.item.id}/vulnerabilities/${data.item.lastScan.id}`"
+        >{{ data.item.lastScan ? (data.item.lastScan.status === 'finished' ? '查看' : 'b') : 'a' }}</b-link>
+
+        <span v-if="(data.item.lastScan ? (!(data.item.lastScan.status === 'finished')) : true)">
+          {{ data.item.lastScan ? (data.item.lastScan.status === 'failed' ? '失败' : '进行中') : '未扫描' }}
+        </span>
       </template>
-      <template slot="licenses">
-        <b-link to="/projects/1/licenses/1">查看</b-link>
+
+      <template slot="licenses" slot-scope="data">
+        <b-link 
+          :to="`projects/${data.item.id}/licenses/${data.item.lastScan ? data.item.lastScan.id : ''}`"
+        >{{ data.item.lastScan ? (data.item.lastScan.status === 'finished' ? '查看' : '') : '' }}</b-link>
       </template>
+
       <template 
         slot="manage" 
         slot-scope="data"
@@ -79,11 +134,15 @@
             size='sm'
             class="mb-2"
           >
-            <option value="source">源代码</option>
+            <option value="source_code">源代码</option>
             <option value="binary">二进制</option>
           </b-form-select>
 
-          <b-button class="mt-3" block>开始扫描</b-button>
+          <b-button 
+            class="mt-3" 
+            block
+            @click="beginScan(data.item.id)"
+          >开始扫描</b-button>
         </b-modal>
       </template>
     </b-table>
@@ -94,51 +153,44 @@
 export default {
   data() {
     return {
-      options: {
-        chart: {
-          type: 'pie'
-        },
-        title: {
-          text: null
-        },
-        plotOptions: {
-          pie: {
-            shadow: false,
-            showInLegend: true
-          }
-        },
-        series: [{
-          data: [
-            ['未扫描', 2],
-            ['未更新', 0],
-            ['已更新', 3]
-          ]
-        }],
-        pie: {
-          showInLegend: true
-        }
-      },
-      style: {
-        height: 300,
-        width: 300,
-      },
+      orgId: this.$route.params.orgId,
       items: [
         {}
       ],
-      projectsItems: [
-        {
-          name: 'war_test',
-          last_update: '2天前',
-          status: '未扫描',
-        },
-        {
-          name: 'binary_test',
-          last_update: '4天前',
-          status: '未扫描',
-        },
-      ],
-      scanSetting: ''
+      projectStatus: {
+        'never_scanned': '未扫描',
+        'outdated': '未更新',
+        'up_to_date': '已更新',
+      },
+      scanSetting: '',
+      projectsOverview: {},
+      projectList: {},
+      binaryUsage: {},
+      sourcecodeUsage: {}
     }
+  },
+  mounted() {
+    this.getProjectsOverview();
+    this.getProjectList();
+    this.getBinaryUsage();
+    this.getSourcecodeUsage();
+  },
+  methods: {
+    async getProjectsOverview() {
+      this.projectsOverview = await this.$backend.orgs.projects.getList(this.orgId, 'overview');
+    },
+    async getProjectList() {
+      this.projectList = await this.$backend.orgs.projects.getList(this.orgId);
+    },
+    async getBinaryUsage() {
+      this.binaryUsage = (await this.$backend.orgs.binaryUsage.getList(this.orgId)).results[0];
+    },
+    async getSourcecodeUsage() {
+      this.sourcecodeUsage = await this.$backend.orgs.sourcecodeUsage.getList(this.orgId);
+    },
+    async beginScan(projectId) {
+      await this.$backend.projects.scans.create(projectId);
+    },
   }
 }
 </script>

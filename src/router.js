@@ -1,16 +1,19 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import Cookies from 'js-cookie';
+import backend from './plugins/backend';
 
 Vue.use(VueRouter);
 
 import LogIn from './components/pages/LogIn.vue';
-import Home from './components/pages/workbench.vue';
+import Workbench from './components/pages/Workbench.vue';
 
 import DashBoard from './components/pages/workbench/DashBoard.vue';
 import Projects from './components/pages/workbench/Projects.vue';
 import Libraries from './components/pages/workbench/Libraries.vue';
 import Vulnerabilities from './components/pages/workbench/Vulnerabilities.vue'
 import Licenses from './components/pages/workbench/Licenses.vue';
+import KnowledgeGraph from './components/pages/workbench/KnowledgeGraph.vue'
 import Settings from './components/pages/workbench/Settings.vue';
 import CreateOrg from './components/pages/workbench/CreateOrg.vue';
 
@@ -31,119 +34,138 @@ import Members from './components/pages/workbench/settings/Members.vue';
 import Integration from './components/pages/workbench/settings/Integration.vue';
 import AccessTokens from './components/pages/workbench/settings/AccessTokens.vue';
 
-export default new VueRouter({
+import UserSetting from './components/pages/workbench/UserSetting.vue';
+
+const router = new VueRouter({
   routes: [
     {
       path: '/',
-      redirect: '/home'
+      redirect: '/login'
     },
     {
       path: '/login',
       component: LogIn
     },
     {
-      path: '/home',
-      component: Home,
+      path: '/workbench/:orgId',
+      component: Workbench,
       children: [
         {
-          path: '/',
-          redirect: '/dashboard'
-        },
-        {
-          path: '/dashboard',
+          path: 'dashboard',
           component: DashBoard
         },
         {
-          path: '/projects',
+          path: 'projects',
           component: Projects
         },
         {
-          path: '/libraries',
+          path: 'libraries',
           component: Libraries
         },
         {
-          path: '/vulnerabilities',
+          path: 'vulnerabilities',
           component: Vulnerabilities
         },
         {
-          path: '/licenses',
+          path: 'licenses',
           component: Licenses
         },
         {
-          path: '/manage',
+          path: 'knowledge-graph',
+          component: KnowledgeGraph
+        },
+        {
+          path: 'manage',
           component: ProjectManage
         },
         {
-          path: '/settings',
+          path: 'settings',
           component: Settings,
           children: [
             {
-              path: '/',
-              redirect: '/settings/organizations'
-            },
-            {
-              path: '/settings/organizations',
+              path: 'organizations',
               component: Organizations
             },
             {
-              path: '/settings/teams',
+              path: 'teams',
               component: Teams
             },
             {
-              path: '/settings/teams/:teamId',
+              path: 'teams/:teamId',
               component: TeamDetail
             },
             {
-              path: '/settings/members',
+              path: 'members',
               component: Members
             },
             {
-              path: '/settings/integration',
+              path: 'integration',
               component: Integration
             },
             {
-              path: '/settings/accesstokens',
+              path: 'accesstokens',
               component: AccessTokens
             },
           ]
         },
         {
-          path: '/createorg',
+          path: 'createorg',
           component: CreateOrg
         },
         {
-          path: '/projects/:projectId',
+          path: 'projects/:projectId',
           component: ProjectDetail
         },
         {
-          path: '/projects/:projectId/compare',
+          path: 'projects/:projectId/compare',
           component: ProjectCompare
         },
         {
-          path: '/projects/:projectId/libraries/:libraryId',
+          path: 'projects/:projectId/libraries/:libraryId',
           component: LibraryResult
         },
         {
-          path: '/projects/:projectId/libraries/:libraryId/issue/:issueId',
+          path: 'projects/:projectId/libraries/:libraryId/issue/:issueId',
           component: LibraryDetail
         },
         {
-          path: '/projects/:projectId/vulnerabilities/:vulnerabilityId',
+          path: 'projects/:projectId/vulnerabilities/:vulnerabilityId',
           component: VulnerabilityResult
         },
         {
-          path: '/projects/:projectId/vulnerabilities/:vulnerabilityId/issue/:issueId',
+          path: 'projects/:projectId/vulnerabilities/:vulnerabilityId/issue/:issueId',
           component: VulnerabilityDetail
         },
         {
-          path: '/projects/:projectId/licenses/:licenseId',
+          path: 'projects/:projectId/licenses/:licenseId',
           component: LicenseResult
         },
         {
-          path: '/projects/:projectId/licenses/:licenseId/issue/:issueId',
+          path: 'projects/:projectId/licenses/:licenseId/issue/:issueId',
           component: LicenseDetail
         },
+        {
+          path: 'user',
+          component: UserSetting
+        }
       ]
     }
   ]
 });
+
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login') {
+    if (Cookies.get('NTU_Token')) {
+      backend.getOrgId().then(res => {
+        next({ path: `/workbench/${res.results[0].id}/dashboard` })
+      });
+    }
+
+    next();
+  }
+  else{
+    Cookies.get('NTU_Token') ? next() : next({ path: '/login' });
+  }
+});
+
+export default router;

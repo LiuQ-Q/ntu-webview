@@ -6,10 +6,13 @@ import BootstrapVue from 'bootstrap-vue';
 import i18n from './i18n';
 import backend from './plugins/backend';
 import highcharts from './plugins/highcharts';
+import mixin from './components/mixin';
 
 Vue.use(BootstrapVue);
 Vue.use(backend);
 Vue.use(highcharts);
+
+Vue.mixin(mixin);
 
 import './assets/css/main.less';
 

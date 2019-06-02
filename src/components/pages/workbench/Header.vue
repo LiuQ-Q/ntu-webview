@@ -17,7 +17,7 @@
       <b-link
         v-for="(nav, index) in navs"
         :key="index"
-        :to="nav.url"
+        :to="`/workbench/${orgId}/${nav.url}`"
         class="ml-4"
         style="color:rgba(255, 255, 255, 0.5);"
       >{{ nav.name }}</b-link>

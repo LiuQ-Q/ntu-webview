@@ -115,8 +115,8 @@ export default {
 				getList() {
 					return api.get('/orgs/', Options()).then(transformData);
 				},
-				getById(orgId) {
-					return api.get(`/orgs/${orgId}/`, Options()).then(transformData);
+				getById(orgId, mode = '') {
+					return api.get(`/orgs/${orgId}/${mode}`, Options()).then(transformData);
 				},
 				members: {
 					create(orgId) {
@@ -227,8 +227,8 @@ export default {
 				getList() {
 					return api.get('/projects/', Options()).then(transformData);
 				},
-				getById(projectId) {
-					return api.get(`/projects/${projectId}/`, Options()).then(transformData);
+				getById(projectId, mode = '') {
+					return api.get(`/projects/${projectId}/${mode}`, Options()).then(transformData);
 				},
 				scans: {
 					create(projectId) {
@@ -263,8 +263,8 @@ export default {
 				getList() {
 					return api.get('/scans/', Options()).then(transformData);
 				},
-				getById(scanId) {
-					return api.get(`/scans/${scanId}/`, Options()).then(transformData);
+				getById(scanId, mode = '') {
+					return api.get(`/scans/${scanId}/${mode}`, Options()).then(transformData);
 				},
 				issues: {
 					create(scanId, mode = '') {
@@ -283,7 +283,7 @@ export default {
 						return api.get(`/scans/${scanId}/issues/${issueId}/`, Options()).then(transformData);
 					}
 				},
-				library: {
+				libraries: {
 					getList(scanId, mode = '') {
 						return api.get(`/scans/${scanId}/library-versions/${mode}`, Options()).then(transformData);
 					},

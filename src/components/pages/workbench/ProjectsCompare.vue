@@ -1,7 +1,7 @@
 <template>
   <b-container>
     <div class="mb-5">
-      <h1>项目比较</h1>
+      <h1>扫描比较</h1>
     </div>
 
     <b-table
@@ -155,6 +155,10 @@ export default {
         },
       ]
     }
+  },
+  mounted() {
+    console.log(this.$route.params);
+    
   }
 }
 </script>

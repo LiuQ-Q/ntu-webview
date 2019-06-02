@@ -117,31 +117,31 @@ const router = new VueRouter({
           component: ProjectDetail
         },
         {
-          path: 'projects/:projectId/compare',
+          path: 'projects/:projectId/compare/:compareId',
           component: ProjectCompare
         },
         {
-          path: 'projects/:projectId/libraries/:libraryId',
+          path: 'projects/:projectId/libraries/:scanId',
           component: LibraryResult
         },
         {
-          path: 'projects/:projectId/libraries/:libraryId/issue/:issueId',
+          path: 'projects/:projectId/libraries/:scanId/issue/:issueId',
           component: LibraryDetail
         },
         {
-          path: 'projects/:projectId/vulnerabilities/:vulnerabilityId',
+          path: 'projects/:projectId/vulnerabilities/:scanId',
           component: VulnerabilityResult
         },
         {
-          path: 'projects/:projectId/vulnerabilities/:vulnerabilityId/issue/:issueId',
+          path: 'projects/:projectId/vulnerabilities/:scanId/issue/:issueId',
           component: VulnerabilityDetail
         },
         {
-          path: 'projects/:projectId/licenses/:licenseId',
+          path: 'projects/:projectId/licenses/:scanId',
           component: LicenseResult
         },
         {
-          path: 'projects/:projectId/licenses/:licenseId/issue/:issueId',
+          path: 'projects/:projectId/licenses/:scanId/issue/:issueId',
           component: LicenseDetail
         },
         {

@@ -256,7 +256,7 @@ export default {
   },
   methods: {
     async getIssuesSummary() {
-      this.issuesSummary = await this.$backend.orgs.issues.getList(this.orgId, 'issue-summary');
+      this.issuesSummary = await this.$backend.orgs.issues.getListMode(this.orgId, 'issue-summary');
       
       Object.keys(this.issuesSummary).forEach((key) => {
         this.vulCount.none += this.issuesSummary[key].none;
@@ -271,10 +271,10 @@ export default {
       this.total.vul = this.total.bug + this.total.cve + this.total.vcc;
     },
     async getIssuesOverview() {
-      this.issuesOverview = (await this.$backend.orgs.projects.getList(this.orgId, 'issue-overview')).results;
+      this.issuesOverview = (await this.$backend.orgs.projects.getListMode(this.orgId, 'issue-overview')).results;
     },
     async getgroupByIssue() {
-      this.groupByIssue = (await this.$backend.orgs.issues.getList(this.orgId, 'group-by-issues')).results;
+      this.groupByIssue = (await this.$backend.orgs.issues.getListMode(this.orgId, 'group-by-issues')).results;
     }
   }
 }

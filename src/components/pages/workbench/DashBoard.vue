@@ -211,7 +211,7 @@ export default {
   },
   methods: {
     async getProjectsOverview() {
-      this.projectsOverview = await this.$backend.orgs.projects.getList(this.orgId, 'overview');
+      this.projectsOverview = await this.$backend.orgs.projects.getListMode(this.orgId, 'overview');
     },
     async getProjectList() {
       this.projectList = await this.$backend.orgs.projects.getList(this.orgId);
@@ -223,7 +223,7 @@ export default {
       });
     },
     async getIssuesSummary() {
-      const issuesSummary = await this.$backend.orgs.issues.getList(this.orgId, 'issue-summary');
+      const issuesSummary = await this.$backend.orgs.issues.getListMode(this.orgId, 'issue-summary');
       
       Object.keys(issuesSummary).forEach((key) => {
         this.issuesCount.none += issuesSummary[key].none;
@@ -237,7 +237,7 @@ export default {
       this.memberList = await this.$backend.orgs.members.getList(this.orgId);
     },
     async getLicensesOverview() {
-      this.licensesOverview = await this.$backend.orgs.licenses.getList(this.orgId, 'overview');
+      this.licensesOverview = await this.$backend.orgs.licenses.getListMode(this.orgId, 'overview');
     },
     async getSourcecodeUsage() {
       this.sourcecodeUsage = (await this.$backend.orgs.sourcecodeUsage.getList(this.orgId)).results[0];

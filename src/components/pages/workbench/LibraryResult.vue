@@ -181,7 +181,7 @@ export default {
   methods: {
     async getScansLibraryOverview() {
       // 总览
-      this.scansOverview = await this.$backend.scans.libraries.getList(this.scanId, 'overview');
+      this.scansOverview = await this.$backend.scans.libraries.getListMode(this.scanId, 'overview');
     },
     async getScansLibrary() {
       // 组件清单
@@ -199,7 +199,7 @@ export default {
     // },
     // async getScansLibraryGraph() {
     //   // 
-    //   this.scansLibraryGraph = await this.$backend.scans.libraries.getList(this.scanId, 'dependency-graph');
+    //   this.scansLibraryGraph = await this.$backend.scans.libraries.getListMode(this.scanId, 'dependency-graph');
     //   // console.log(this.scansLibraryGraph);
     // },
   }

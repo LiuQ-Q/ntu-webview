@@ -151,15 +151,15 @@ export default {
   },
   methods: {
     async getLicenseOverview() {
-      this.licenseOverview = await this.$backend.orgs.licenses.getList(this.orgId, 'overview');
+      this.licenseOverview = await this.$backend.orgs.licenses.getListMode(this.orgId, 'overview');
 
       this.licenseIssueTotal = this.licenseOverview['approve'] + this.licenseOverview['flag'] + this.licenseOverview['deny'];
     },
     async getProjectByLicense() {
-      this.projectByLicense = (await this.$backend.orgs.projects.getList(this.orgId, 'license-result-overview')).results;
+      this.projectByLicense = (await this.$backend.orgs.projects.getListMode(this.orgId, 'license-result-overview')).results;
     },
     async getGroupByLicense() {
-      this.groupByLicense = (await this.$backend.orgs.licenses.getList(this.orgId, 'group-by-licenses')).results;
+      this.groupByLicense = (await this.$backend.orgs.licenses.getListMode(this.orgId, 'group-by-licenses')).results;
       console.log(this.groupByLicense);
     }
   }

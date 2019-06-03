@@ -152,7 +152,7 @@ export default {
       this.licenseIssues = await this.$backend.scans.licenseIssues.getById(this.scanId, this.issueId);
     },
     async getIssuesLastAction() {
-      this.issuesLastAction = await this.$backend.scans.licenseIssues.getById(this.scanId, this.issueId, 'last-action');
+      this.issuesLastAction = await this.$backend.scans.licenseIssues.getByIdMode(this.scanId, this.issueId, 'last-action');
 
       this.actionType = this.issuesLastAction['action_type'];
       this.priority = this.issuesLastAction['priority'];
@@ -163,7 +163,7 @@ export default {
       this.teamsMembers = (await this.$backend.teams.members.getList(this.orgId)).results;
     },
     async getAttributes() {
-      const attributes = await this.$backend.scans.licenseIssues.getById(this.scanId, this.issueId, 'attributes' );
+      const attributes = await this.$backend.scans.licenseIssues.getByIdMode(this.scanId, this.issueId, 'attributes' );
 
       attributes.forEach(ele => {
         switch (ele.category) {

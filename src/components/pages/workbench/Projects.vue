@@ -179,7 +179,7 @@ export default {
   },
   methods: {
     async getProjectsOverview() {
-      this.projectsOverview = await this.$backend.orgs.projects.getList(this.orgId, 'overview');
+      this.projectsOverview = await this.$backend.orgs.projects.getListMode(this.orgId, 'overview');
     },
     async getProjectList() {
       this.projectList = await this.$backend.orgs.projects.getList(this.orgId);

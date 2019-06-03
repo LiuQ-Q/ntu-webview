@@ -210,7 +210,7 @@ export default {
   },
   methods: {
     async getLibraryOverview() {
-      this.libraryOverview = (await this.$backend.orgs.projects.getList(this.orgId, 'library-version-overview')).results;
+      this.libraryOverview = (await this.$backend.orgs.projects.getListMode(this.orgId, 'library-version-overview')).results;
       this.libraryOverview.forEach((ele) => {
         this.vulCount.none += ele['none_count'];
         this.vulCount.medium += ele['medium_count'];
@@ -226,10 +226,10 @@ export default {
       });
     },
     async getLibrarySummary() {
-      this.librarySummary = await this.$backend.orgs.libraries.getList(this.orgId, 'library-version-summary');
+      this.librarySummary = await this.$backend.orgs.libraries.getListMode(this.orgId, 'library-version-summary');
     },
     async getgroupByLibrary() {
-      this.groupByLibrary = (await this.$backend.orgs.libraries.getList(this.orgId, 'group-by-library-versions')).results;
+      this.groupByLibrary = (await this.$backend.orgs.libraries.getListMode(this.orgId, 'group-by-library-versions')).results;
     },
   }
 }

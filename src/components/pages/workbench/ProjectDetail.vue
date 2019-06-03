@@ -22,6 +22,20 @@
         <p><small>拥有者:&nbsp;{{ projectById['owner_name'] }}</small></p>
         <p><small>来源:&nbsp;{{ projectById['provider'] }}</small></p>
         <p><small>创建时间:&nbsp;{{ format(projectById['created']) }}</small></p>
+        <b-dropdown 
+          text="操作"
+          size="sm"
+        >
+          <b-dropdown-item
+            v-if="projectById['can_scan']"
+            @click="deleteProject(projectId)"
+          >隐藏</b-dropdown-item>
+            
+          <b-dropdown-item
+            v-if="!projectById['can_scan']"
+            @click="updateProject(projectId)"
+          >取消隐藏</b-dropdown-item>
+        </b-dropdown>
       </template>
 
       <template slot="scan">
@@ -273,30 +287,30 @@ export default {
     async getProjectById() {
       // 项目信息
       this.projectById = await this.$backend.projects.getById(this.projectId);
-      // console.log(this.projectById);
+      console.log(this.projectById);
     },
     async getProjectScanPolicies() {
       // 
-      this.projectScanPolicies = await this.$backend.projects.getById(this.projectId, 'scan-policies');
+      this.projectScanPolicies = await this.$backend.projects.getByIdMode(this.projectId, 'scan-policies');
       // console.log(this.projectScanPolicies);
     },
     async getProjectLicensePolicies() {
       // 当前使用的政策
-      this.licensePolicy = (await this.$backend.projects.getById(this.projectId, 'license-policies')).results[0]['license_policy'];
+      this.licensePolicy = (await this.$backend.projects.getByIdMode(this.projectId, 'license-policies')).results[0]['license_policy'];
     },
     async getOrgsSourcecode() {
       // 
-      this.orgsSourcecode = await this.$backend.orgs.getById(this.orgId, 'sourcecode-usage');
+      this.orgsSourcecode = await this.$backend.orgs.getByIdMode(this.orgId, 'sourcecode-usage');
       // console.log(this.orgsSourcecode);
     },
     async getOrgsLicensePolicies() {
       // 许可证政策
-      this.orgsLicensePolicies = (await this.$backend.orgs.getById(this.orgId, 'license-policies')).results;
+      this.orgsLicensePolicies = (await this.$backend.orgs.getByIdMode(this.orgId, 'license-policies')).results;
       // console.log(this.orgsLicensePolicies);
     },
     async getProjectUploads() {
       // 上传文件相关
-      this.projectUploads = (await this.$backend.projects.getById(this.projectId, 'uploads')).results[0];
+      this.projectUploads = (await this.$backend.projects.getByIdMode(this.projectId, 'uploads')).results[0];
       // console.log(this.projectUploads);
     },
     
@@ -306,13 +320,23 @@ export default {
     async openScanStatus(scanId) {
       console.log(scanId);
       
-      this.scansLog = await this.$backend.scans.getById(scanId, 'logs');
+      this.scansLog = await this.$backend.scans.getByIdMode(scanId, 'logs');
       console.log(this.scansLog);
       
       this.$refs['modal-scan-status'].show();
     },
     compare() {
       this.$router.push('24/compare/1&2&3&4')
+    },
+    async deleteProject(projectId) {
+      // 隐藏项目
+      this.$backend.orgs.projects.deleteById(this.orgId, projectId);
+      this.projectById = await this.$backend.projects.getById(this.projectId);
+    },
+    async updateProject(projectId) {
+      // 取消隐藏项目
+      this.$backend.orgs.projects.updateById(this.orgId, projectId);
+      this.projectById = await this.$backend.projects.getById(this.projectId);
     }
   }
 }

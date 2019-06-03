@@ -166,8 +166,7 @@ router.beforeEach((to, from, next) => {
     }
 
     next();
-  }
-  else{
+  } else {
     Cookies.get('NTU_Token') ? next() : next({ path: '/login' });
   }
 });

@@ -115,8 +115,11 @@ export default {
 				getList() {
 					return api.get('/orgs/', Options()).then(transformData);
 				},
-				getById(orgId, mode = '') {
-					return api.get(`/orgs/${orgId}/${mode}`, Options()).then(transformData);
+				getById(orgId) {
+					return api.get(`/orgs/${orgId}/`, Options()).then(transformData);
+				},
+				getByIdMode(orgId, mode) {
+					return api.get(`/orgs/${orgId}/${mode}/`, Options()).then(transformData);
 				},
 				members: {
 					create(orgId) {
@@ -129,7 +132,7 @@ export default {
 						return api.put(`/orgs/${orgId}/members/${memberId}/`, Options()).then(transformData);
 					},
 					getList(orgId) {
-						return api.get(`/orgs/${orgId}/members`, Options()).then(transformData);
+						return api.get(`/orgs/${orgId}/members/`, Options()).then(transformData);
 					},
 					getById(orgId, memberId) {
 						return api.get(`/orgs/${orgId}/members/${memberId}/`, Options()).then(transformData);
@@ -161,8 +164,11 @@ export default {
 					}
 				},
 				issues: {
-					getList(orgId, mode = '') {
-						return api.get(`/orgs/${orgId}/issues/${mode}`, Options()).then(transformData);
+					getList(orgId) {
+						return api.get(`/orgs/${orgId}/issues/`, Options()).then(transformData);
+					},
+					getListMode(orgId, mode) {
+						return api.get(`/orgs/${orgId}/issues/${mode}/`, Options()).then(transformData);
 					},
 					getById(orgId, issueId) {
 						return api.get(`/orgs/${orgId}/issues/${issueId}/`, Options()).then(transformData);
@@ -174,16 +180,22 @@ export default {
 					}
 				},
 				libraries: {
-					getList(orgId, mode = '') {
-						return api.get(`/orgs/${orgId}/library-versions/${mode}`, Options()).then(transformData);
+					getList(orgId) {
+						return api.get(`/orgs/${orgId}/library-versions/`, Options()).then(transformData);
+					},
+					getListMode(orgId, mode) {
+						return api.get(`/orgs/${orgId}/library-versions/${mode}/`, Options()).then(transformData);
 					},
 					getById(orgId, libraryId) {
 						return api.get(`/orgs/${orgId}/library-versions/${libraryId}/`, Options()).then(transformData);
 					}
 				},
 				licenses: {
-					getList(orgId, mode = '') {
-						return api.get(`/orgs/${orgId}/licenses/${mode}`, Options()).then(transformData);
+					getList(orgId) {
+						return api.get(`/orgs/${orgId}/licenses/`, Options()).then(transformData);
+					},
+					getListMode(orgId, mode) {
+						return api.get(`/orgs/${orgId}/licenses/${mode}/`, Options()).then(transformData);
 					},
 					getById(orgId, licenseId) {
 						return api.get(`/orgs/${orgId}/licenses/${licenseId}/`, Options()).then(transformData);
@@ -201,20 +213,32 @@ export default {
 							archived: false
 						}, Options()).then(transformData);
 					},
-					getList(orgId, mode = '') {
-						return api.get(`/orgs/${orgId}/projects/${mode}`, Options()).then(transformData);
+					getList(orgId) {
+						return api.get(`/orgs/${orgId}/projects/`, Options()).then(transformData);
 					},
-					getById(orgId, projectId, mode = '') {
-						return api.get(`/orgs/${orgId}/projects/${projectId}/${mode}`, Options()).then(transformData);
-					}
+					getListMode(orgId, mode) {
+						return api.get(`/orgs/${orgId}/projects/${mode}/`, Options()).then(transformData);
+					},
+					getById(orgId, projectId) {
+						return api.get(`/orgs/${orgId}/projects/${projectId}/`, Options()).then(transformData);
+					},
+					getByIdMode(orgId, projectId, mode) {
+						return api.get(`/orgs/${orgId}/projects/${projectId}/${mode}/`, Options()).then(transformData);
+					},
 				},
 				scans: {
-					getList(orgId, mode = '') {
-						return api.get(`/orgs/${orgId}/scans/${mode}`, Options()).then(transformData);
+					getList(orgId) {
+						return api.get(`/orgs/${orgId}/scans/`, Options()).then(transformData);
 					},
-					getById(orgId, scanId, mode = '') {
-						return api.get(`/orgs/${orgId}/scans/${scanId}/${mode}`, Options()).then(transformData);
-					}
+					getListMode(orgId, mode) {
+						return api.get(`/orgs/${orgId}/scans/${mode}/`, Options()).then(transformData);
+					},
+					getById(orgId, scanId) {
+						return api.get(`/orgs/${orgId}/scans/${scanId}/`, Options()).then(transformData);
+					},
+					getByIdMode(orgId, scanId, mode) {
+						return api.get(`/orgs/${orgId}/scans/${scanId}/${mode}/`, Options()).then(transformData);
+					},
 				},
 				sourcecodeUsage: {
 					getList(orgId) {
@@ -229,8 +253,11 @@ export default {
 				getList() {
 					return api.get('/projects/', Options()).then(transformData);
 				},
-				getById(projectId, mode = '') {
-					return api.get(`/projects/${projectId}/${mode}`, Options()).then(transformData);
+				getById(projectId) {
+					return api.get(`/projects/${projectId}/`, Options()).then(transformData);
+				},
+				getByIdMode(projectId, mode) {
+					return api.get(`/projects/${projectId}/${mode}/`, Options()).then(transformData);
 				},
 				scans: {
 					create(projectId, scanType) {
@@ -248,8 +275,11 @@ export default {
 					updateById(projectId, scanId) {
 						return api.put(`/projects/${projectId}/scans/${scanId}/`, Options()).then(transformData);
 					},
-					getList(projectId, mode = '') {
-						return api.get(`/projects/${projectId}/scans/${mode}`, Options()).then(transformData);
+					getList(projectId, mode) {
+						return api.get(`/projects/${projectId}/scans/`, Options()).then(transformData);
+					},
+					getListMode(projectId, mode) {
+						return api.get(`/projects/${projectId}/scans/${mode}/`, Options()).then(transformData);
 					},
 					getById(projectId, scanId) {
 						return api.get(`/projects/${projectId}/scans/${scanId}/`, Options()).then(transformData);
@@ -271,41 +301,65 @@ export default {
 				getList() {
 					return api.get('/scans/', Options()).then(transformData);
 				},
-				getById(scanId, mode = '') {
-					return api.get(`/scans/${scanId}/${mode}`, Options()).then(transformData);
+				getById(scanId) {
+					return api.get(`/scans/${scanId}/`, Options()).then(transformData);
+				},
+				getByIdMode(scanId, mode) {
+					return api.get(`/scans/${scanId}/${mode}/`, Options()).then(transformData);
 				},
 				issues: {
-					create(scanId, mode = '') {
-						return api.post(`/scans/${scanId}/issues/${mode}`, Options()).then(transformData);
+					create(scanId) {
+						return api.post(`/scans/${scanId}/issues/`, Options()).then(transformData);
 					},
-					createById(scanId, issueId, mode) {
-						return api.post(`/scans/${scanId}/issues/${issueId}/${mode}`, Options()).then(transformData);
+					createMode(scanId, mode) {
+						return api.post(`/scans/${scanId}/issues/${mode}/`, Options()).then(transformData);
 					},
-					updateById(scanId, issueId, mode) {
-						return api.put(`/scans/${scanId}/issues/${issueId}/${mode}`, Options()).then(transformData);
+					createById(scanId, issueId) {
+						return api.post(`/scans/${scanId}/issues/${issueId}/`, Options()).then(transformData);
 					},
-					getList(scanId, mode = '') {
-						return api.get(`/scans/${scanId}/issues/${mode}`, Options()).then(transformData);
+					createByIdMode(scanId, issueId, mode) {
+						return api.post(`/scans/${scanId}/issues/${issueId}/${mode}/`, Options()).then(transformData);
+					},
+					updateById(scanId, issueId) {
+						return api.put(`/scans/${scanId}/issues/${issueId}/`, Options()).then(transformData);
+					},
+					updateByIdMode(scanId, issueId, mode) {
+						return api.put(`/scans/${scanId}/issues/${issueId}/${mode}/`, Options()).then(transformData);
+					},
+					getList(scanId) {
+						return api.get(`/scans/${scanId}/issues/`, Options()).then(transformData);
+					},
+					getListMode(scanId, mode) {
+						return api.get(`/scans/${scanId}/issues/${mode}/`, Options()).then(transformData);
 					},
 					getById(scanId, issueId) {
 						return api.get(`/scans/${scanId}/issues/${issueId}/`, Options()).then(transformData);
 					}
 				},
 				libraries: {
-					getList(scanId, mode = '') {
-						return api.get(`/scans/${scanId}/library-versions/${mode}`, Options()).then(transformData);
+					getList(scanId) {
+						return api.get(`/scans/${scanId}/library-versions/`, Options()).then(transformData);
+					},
+					getListMode(scanId, mode) {
+						return api.get(`/scans/${scanId}/library-versions/${mode}/`, Options()).then(transformData);
 					},
 					getById(scanId, libraryId) {
 						return api.get(`/scans/${scanId}/issues/${libraryId}/`, Options()).then(transformData);
 					}
 				},
 				licenseIssues: {
-					getList(scanId, mode = '') {
-						return api.get(`/scans/${scanId}/licenseissues/${mode}`, Options()).then(transformData);
+					getList(scanId) {
+						return api.get(`/scans/${scanId}/licenseissues/`, Options()).then(transformData);
 					},
-					getById(scanId, licenseIssuesId, mode = '') {
-						return api.get(`/scans/${scanId}/licenseissues/${licenseIssuesId}/${mode}`, Options()).then(transformData);
-					}
+					getListMode(scanId, mode) {
+						return api.get(`/scans/${scanId}/licenseissues/${mode}/`, Options()).then(transformData);
+					},
+					getById(scanId, licenseIssuesId) {
+						return api.get(`/scans/${scanId}/licenseissues/${licenseIssuesId}/`, Options()).then(transformData);
+					},
+					getByIdMode(scanId, licenseIssuesId, mode) {
+						return api.get(`/scans/${scanId}/licenseissues/${licenseIssuesId}/${mode}/`, Options()).then(transformData);
+					},
 				},
 				summaries: {
 					getList(scanId) {

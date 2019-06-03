@@ -275,8 +275,6 @@ export default {
     },
     async getgroupByIssue() {
       this.groupByIssue = (await this.$backend.orgs.issues.getList(this.orgId, 'group-by-issues')).results;
-      console.log(this.groupByIssue);
-      
     }
   }
 }

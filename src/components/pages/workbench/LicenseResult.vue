@@ -6,14 +6,15 @@
 
     <b-table 
       :fields="[
-        {key: 'name', label: '许可证名称'},
-        {key: 'style', label: '类型'},
-        {key: 'status', label: '状态'},
-        {key: 'library', label: '组件'},
-        {key: 'score', label: '打分'},
+        {key: 'license_name', label: '许可证名称'},
+        {key: 'category', label: '类型'},
+        {key: 'action_type', label: '状态'},
+        {key: 'library_name', label: '组件'},
+        {key: 'license_score', label: '打分'},
         {key: 'detail', label: '详情'},
       ]" 
-      :items='licenseResultItems'
+      :items='licenseIssues'
+      class="license-result"
     >
       <template slot="thead-top">
         <tr>
@@ -24,8 +25,16 @@
         </tr>  
       </template>
 
-      <template slot="detail">
-        <b-link to="/projects/1/licenses/1/issue/1">查看</b-link>
+      <template 
+        slot="category"
+        slot-scope="data"
+      >{{ category[data.item['license_category']] }}</template>
+
+      <template 
+        slot="detail"
+        slot-scope="data"
+      >
+        <b-link :to="`${scanId}/issue/${data.item.id}`">查看</b-link>
       </template>
     </b-table>
   </b-container>
@@ -35,20 +44,31 @@
 export default {
   data() {
     return {
-      licenseResultItems: [
-        {
-          name: 'GNU Lesser General Public License v2.1 or later',
-          style: '受限',
-          status: 'N.A.',
-          library: 'ffmpeg',
-          score: 8
-        }
-      ]
+      orgId: this.$route.params.orgId,
+      projectId: this.$route.params.projectId,
+      scanId: this.$route.params.scanId,
+      licenseIssues: [],
+      category: {
+        Permissive: '允许的',
+        Restrictive: '受限的',
+      }
+    }
+  },
+  mounted() {
+    this.getLicenseIssues();
+  },
+  methods: {
+    async getLicenseIssues() {
+      this.licenseIssues = (await this.$backend.scans.licenseIssues.getList(this.scanId)).results;
     }
   }
 }
 </script>
 
-<style>
-
+<style lang="less">
+.license-result {
+  td:nth-child(1) {
+    width: 35%;
+  }
+}
 </style>

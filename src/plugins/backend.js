@@ -170,7 +170,7 @@ export default {
 				},
 				knowledgeGraph: {
 					getList(orgId) {
-						return api.get(`/orgs/${orgId}/knowledge/`, Options()).then(transformData);
+						return api.get(`/orgs/${orgId}/knowledge-graph/`, Options()).then(transformData);
 					}
 				},
 				libraries: {
@@ -197,7 +197,9 @@ export default {
 						return api.delete(`/orgs/${orgId}/projects/${projectId}/`, Options()).then(transformData);
 					},
 					updateById(orgId, projectId) {
-						return api.put(`/orgs/${orgId}/projects/${projectId}/`, Options()).then(transformData);
+						return api.patch(`/orgs/${orgId}/projects/${projectId}/`, {
+							archived: false
+						}, Options()).then(transformData);
 					},
 					getList(orgId, mode = '') {
 						return api.get(`/orgs/${orgId}/projects/${mode}`, Options()).then(transformData);
@@ -231,8 +233,14 @@ export default {
 					return api.get(`/projects/${projectId}/${mode}`, Options()).then(transformData);
 				},
 				scans: {
-					create(projectId) {
-						return api.post(`/projects/${projectId}/scans/`, Options()).then(transformData);
+					create(projectId, scanType) {
+						return api.post(`/projects/${projectId}/scans/`, {
+							scan_type: scanType
+						}, Options({
+							params: {
+								branch: 'master'
+							}
+						})).then(transformData);
 					},
 					deleteById(projectId, scanId) {
 						return api.delete(`/projects/${projectId}/scans/${scanId}/`, Options()).then(transformData);

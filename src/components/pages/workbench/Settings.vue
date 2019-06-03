@@ -7,7 +7,7 @@
       <b-nav-item
         v-for="(nav, index) in navs"
         :key="index"
-        :to="`/settings/${nav.url}`"
+        :to="`${nav.url}`"
         style="float:left;"
       >{{ nav.title }}</b-nav-item>
     </b-nav>

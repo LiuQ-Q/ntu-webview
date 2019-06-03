@@ -83,6 +83,10 @@ const router = new VueRouter({
           component: Settings,
           children: [
             {
+              path: '/',
+              redirect: 'organizations'
+            },
+            {
               path: 'organizations',
               component: Organizations
             },

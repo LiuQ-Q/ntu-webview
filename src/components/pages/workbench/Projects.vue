@@ -118,8 +118,13 @@
       <template 
         slot="manage" 
         slot-scope="data"
+        v-if="data.item !== undefined"
       >
-        <b-link @click="$bvModal.show(`modalaa-scan-${data.item.name}`)">开始扫描</b-link>
+        <b-button 
+          size="sm"
+          :disabled="data.item.lastScan ? (data.item.lastScan.status === 'queued') : false"
+          @click="$bvModal.show(`modalaa-scan-${data.item.name}`)"
+        >开始扫描</b-button>
 
         <b-modal 
           :id="`modalaa-scan-${data.item.name}`"
@@ -159,7 +164,7 @@ export default {
         'outdated': '未更新',
         'up_to_date': '已更新',
       },
-      scanSetting: '',
+      scanSetting: 'source_code',
       projectsOverview: {},
       projectList: {},
       binaryUsage: {},
@@ -178,6 +183,8 @@ export default {
     },
     async getProjectList() {
       this.projectList = await this.$backend.orgs.projects.getList(this.orgId);
+      console.log(this.projectList);
+      
     },
     async getBinaryUsage() {
       this.binaryUsage = (await this.$backend.orgs.binaryUsage.getList(this.orgId)).results[0];
@@ -186,7 +193,7 @@ export default {
       this.sourcecodeUsage = await this.$backend.orgs.sourcecodeUsage.getList(this.orgId);
     },
     async beginScan(projectId) {
-      await this.$backend.projects.scans.create(projectId);
+      this.$backend.projects.scans.create(projectId, this.scanSetting);
     },
   }
 }

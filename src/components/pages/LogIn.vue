@@ -12,18 +12,18 @@
       <b-button type="submit" variant="primary">登录</b-button>
       <b-button variant="success" @click="getList">获取</b-button>
     </b-form>
-    {{teams}}
   </b-card>
 </template>
 
 <script>
+import { sha256 } from 'js-sha256';
+
 export default {
   data() {
     return {
-      username: '',
+      username: 'test1@scantist.com',
       password: '',
       orgId: '',
-      teams: []
     };
   },
   methods: {

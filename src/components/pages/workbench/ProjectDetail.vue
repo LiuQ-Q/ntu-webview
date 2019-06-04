@@ -5,7 +5,7 @@
     </div>
 
     <b-table
-      :items="items"
+      :items="[{}]"
       :fields="[
         { key: 'message', label: '信息' },
         { key: 'scan', label: '扫描设置' },
@@ -40,18 +40,18 @@
 
       <template slot="scan">
         <b-form-checkbox
-          v-model="regularScan"
+          v-model="regularScanStatus"
           switch
         >定期扫描</b-form-checkbox>
 
         <b-form-select
-          v-model="regularScanStyle"
+          v-model="policyCode"
           size='sm'
           class="my-2"
-          :disabled="!regularScan"
+          :disabled="!regularScanStatus"
         >
-          <option value="source">源代码</option>
-          <option value="binary">二进制</option>
+          <option value="1">源代码</option>
+          <option value="2">二进制</option>
         </b-form-select>
 
         <b-form-checkbox
@@ -84,28 +84,42 @@
           >{{ policy['name'] }}</option>
         </b-form-select>
 
-        <b-link @click="$bvModal.show('modal-policy')">添加新政策</b-link>
+        <div>
+          <b-link @click="$bvModal.show('modal-policy')">添加新政策</b-link>
+        </div>
+        <div v-if="!defaultPolicyCode.includes(licensePolicy)">
+          <b-link @click="deletePolicy">删除政策</b-link>
+        </div>
 
         <b-modal 
           id="modal-policy"
+          ref="modal-policy-ref"
           hide-footer
         >
           <template slot="modal-title">添加新政策</template>
 
           <b-form class="signin-form">
             <b-form-group label="名称:">
-              <b-form-input></b-form-input>
+              <b-form-input
+                v-model="policyName"
+              ></b-form-input>
             </b-form-group>
 
             <b-form-group label="简介:">
               <b-form-textarea
                 rows="3"
                 max-rows="6"
+                v-model="policyDesc"
               ></b-form-textarea>
             </b-form-group>
           </b-form>
 
-          <b-button class="mt-3" block>添加</b-button>
+          <b-button
+            size="sm" 
+            class="mt-3" 
+            block
+            @click="addNewPolicy"
+          >添加</b-button>
         </b-modal>
       </template>
 
@@ -116,6 +130,7 @@
         <p>上传时间:&nbsp;{{ format(projectUploads['created']) }}</p>
 
         <b-button
+          size="sm"
           variant="primary"
           :disabled="!file"
           @click="fileUpload"
@@ -154,6 +169,7 @@
           <th colspan="8">&nbsp;</th>
           <th>
             <b-button 
+              size="sm"
               @click="compare"
               :disabled="projectSelected.length < 2"
             >比较</b-button>
@@ -174,7 +190,7 @@
       >
         <b-link
           v-if="data.item['status'] === 'finished'" 
-          :to="`projects/${data.item.project}/libraries/${data.item.id}`"
+          :to="`${data.item.project}/libraries/${data.item.id}`"
         >查看</b-link>
       </template>
 
@@ -184,7 +200,7 @@
       >
         <b-link
           v-if="data.item['status'] === 'finished'" 
-          :to="`projects/${data.item.project}/vulnerabilities/${data.item.id}`"
+          :to="`${data.item.project}/vulnerabilities/${data.item.id}`"
         >查看</b-link>
       </template>
 
@@ -194,7 +210,7 @@
       >
         <b-link
           v-if="data.item['status'] === 'finished'" 
-          :to="`projects/${data.item.project}/licenses/${data.item.id}`"
+          :to="`${data.item.project}/licenses/${data.item.id}`"
         >查看</b-link>
       </template>
 
@@ -239,25 +255,17 @@
 export default {
   data() {
     return {
-      items: [
-        {
-          name: 'binary_test',
-          createTime: 'May 7th 2019, 7:37:49 pm',
-          owner: 'test1',
-          supplier: 'Upload'
-        }
-      ],
-      regularScan: false,
-      regularScanStyle: 'source',
+      regularScanStatus: false,
+      policyCode: '',
       driveScanStyle: 'pull',
 
       file: null,
       licensePolicy: '',
+      defaultPolicyCode: [],
       projectSelected: [],
-      orgId: this.$route.params.orgId,
-      projectId: this.$route.params.projectId,
+      scheduledId: '',
       projectScans: [], // 扫描历史相关
-      projectScanPolicies: {},
+      projectScanPolicies: [],
       projectById: {}, // 项目信息
       orgsSourcecode: {},
       orgsLicensePolicies: [], // 许可证政策
@@ -266,7 +274,25 @@ export default {
         'failed': '失败',
         'finished': '成功'
       },
-      scansLog: {}
+      scansLog: {},
+      policyName: '',
+      policyDesc: ''
+    }
+  },
+  computed: {
+    orgId() {
+      return this.$route.params.orgId;
+    },
+    projectId() {
+      return this.$route.params.projectId;
+    },
+  },
+  watch: {
+    regularScanStatus() {
+      this.regularScan();
+    },
+    licensePolicy() {
+      this.policySetting();
     }
   },
   mounted() {
@@ -287,16 +313,25 @@ export default {
     async getProjectById() {
       // 项目信息
       this.projectById = await this.$backend.projects.getById(this.projectId);
-      console.log(this.projectById);
+      // console.log(this.projectById);
     },
     async getProjectScanPolicies() {
-      // 
-      this.projectScanPolicies = await this.$backend.projects.getByIdMode(this.projectId, 'scan-policies');
-      // console.log(this.projectScanPolicies);
+      // 扫描设置相关
+      this.projectScanPolicies = (await this.$backend.projects.getByIdMode(this.projectId, 'scan-policies')).results;
+
+      this.projectScanPolicies.forEach((ele) => {
+        if (ele['policy_type'] === 'scheduled') {
+          this.scheduledId = ele.id;
+          this.regularScanStatus = ele['in_use'];
+          this.policyCode = ele['policy_code'];
+        }
+      });
     },
     async getProjectLicensePolicies() {
       // 当前使用的政策
       this.licensePolicy = (await this.$backend.projects.getByIdMode(this.projectId, 'license-policies')).results[0]['license_policy'];
+      // console.log(this.licensePolicy);
+      
     },
     async getOrgsSourcecode() {
       // 
@@ -306,7 +341,15 @@ export default {
     async getOrgsLicensePolicies() {
       // 许可证政策
       this.orgsLicensePolicies = (await this.$backend.orgs.getByIdMode(this.orgId, 'license-policies')).results;
-      // console.log(this.orgsLicensePolicies);
+      this.$backend.orgs.getByIdMode(this.orgId, 'license-policies').then(res => {
+        this.orgsLicensePolicies = res.results;
+
+        res.results.forEach(ele => {
+          if (ele['is_default']) {
+            this.defaultPolicyCode.push(ele['policy_code']);
+          }
+        })
+      });
     },
     async getProjectUploads() {
       // 上传文件相关
@@ -318,15 +361,12 @@ export default {
 
     },
     async openScanStatus(scanId) {
-      console.log(scanId);
-      
       this.scansLog = await this.$backend.scans.getByIdMode(scanId, 'logs');
-      console.log(this.scansLog);
       
       this.$refs['modal-scan-status'].show();
     },
     compare() {
-      this.$router.push('24/compare/1&2&3&4')
+      this.$router.push(`24/compare/${this.projectSelected.join('&')}`)
     },
     async deleteProject(projectId) {
       // 隐藏项目
@@ -337,6 +377,27 @@ export default {
       // 取消隐藏项目
       this.$backend.orgs.projects.updateById(this.orgId, projectId);
       this.projectById = await this.$backend.projects.getById(this.projectId);
+    },
+    async regularScan() {
+      this.$backend.projects.scanPolicies.updateById(this.projectId,this.scheduledId, this.regularScanStatus, this.policyCode);
+    },
+    policySetting() {
+      this.$backend.projects.licensePolicies.updateById(this.projectId, this.licensePolicy);
+    },
+    addNewPolicy() {
+      this.$backend.orgs.licensePolicies.create(this.orgId, this.policyName, this.policyDesc).then(res => {
+        this.$backend.projects.licensePolicies.updateById(this.projectId, res['policy_code']).then(res => {
+          this.getProjectLicensePolicies();
+          this.getOrgsLicensePolicies();
+          this.$refs['modal-policy-ref'].hide();
+        });
+      });
+    },
+    deletePolicy() {
+      this.$backend.orgs.licensePolicies.delete(this.orgId, this.licensePolicy).then(res => {
+        this.getProjectLicensePolicies();
+        this.getOrgsLicensePolicies();
+      });
     }
   }
 }

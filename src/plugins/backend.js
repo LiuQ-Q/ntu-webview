@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { sha256 } from 'js-sha256';
 
 function transformData(res) {
 	return res.data;
@@ -38,8 +39,9 @@ export default {
 		Vue.prototype.$backend = {
 			logIn(username, password) {
 				return api.post('/rest-auth/login/', {
-					email: 'test1@scantist.com',
-					password: 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'
+					email: username,
+					// password: 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f',
+					password: sha256(password)
 				}, {
 					params: {
 						_now: Date.now()
@@ -103,8 +105,11 @@ export default {
 				},
 			},
 			orgs: {
-				create() {
-					return api.post('/orgs/', Options()).then(transformData);
+				create(name, description) {
+					return api.post('/orgs/', {
+						name: name,
+						description: description
+					}, Options()).then(transformData);
 				},
 				deleteById(orgId) {
 					return api.delete(`/orgs/${orgId}`, Options()).then(transformData);
@@ -139,8 +144,11 @@ export default {
 					}
 				},
 				teams: {
-					create(orgId) {
-						return api.post(`/orgs/${orgId}/teams/`, Options()).then(transformData);
+					create(orgId, name, description) {
+						return api.post(`/orgs/${orgId}/teams/`, {
+							name: name,
+							description: description
+						}, Options()).then(transformData);
 					},
 					deleteById(orgId, teamId) {
 						return api.delete(`/orgs/${orgId}/teams/${teamId}/`, Options()).then(transformData);
@@ -202,8 +210,13 @@ export default {
 					}
 				},
 				projects: {
-					create(orgId) {
-						return api.post(`/orgs/${orgId}/projects/`, Options()).then(transformData);
+					create(orgId, name, teamId, description, provider) {
+						return api.post(`/orgs/${orgId}/projects/`, {
+							name: name,
+							description: description || '',
+							team: teamId,
+							provider: provider
+						}, Options()).then(transformData);
 					},
 					deleteById(orgId, projectId) {
 						return api.delete(`/orgs/${orgId}/projects/${projectId}/`, Options()).then(transformData);
@@ -236,9 +249,21 @@ export default {
 					getById(orgId, scanId) {
 						return api.get(`/orgs/${orgId}/scans/${scanId}/`, Options()).then(transformData);
 					},
-					getByIdMode(orgId, scanId, mode) {
-						return api.get(`/orgs/${orgId}/scans/${scanId}/${mode}/`, Options()).then(transformData);
-					},
+					getByIdMode({orgId, scanId, mode, limit, page, search, issueType, ordering, scan1, scan2, scan3, scan4}) {
+						return api.get(`/orgs/${orgId}/scans/${scanId}/${mode}/`, Options({
+							params: {
+								// limit: limit || '',
+								// page: page || '',
+								search: search || '',
+								issue_type: issueType || '',
+								ordering: ordering || '',
+								scan1: scan1 || -1,
+								scan2: scan2 || -1,
+								scan3: scan3 || -1,
+								scan4: scan4 || -1,
+							}
+						})).then(transformData);
+					}
 				},
 				sourcecodeUsage: {
 					getList(orgId) {
@@ -247,6 +272,30 @@ export default {
 					getById(orgId, sourcecodeUsageId) {
 						return api.get(`/orgs/${orgId}/sourcecode-usage/${sourcecodeUsageId}/`, Options()).then(transformData);
 					}
+				},
+				licensePolicies: {
+					create(orgId, name, description) {
+						return api.post(`/orgs/${orgId}/license-policies/`, {
+							name: name,
+							description: description
+						}, Options()).then(transformData);
+					},
+					delete(orgId, policyCode) {
+						return api.delete(`/orgs/${orgId}/license-policies/${policyCode}/`, Options()).then(transformData);
+					},
+				},
+				tokens: {
+					create(orgId, name) {
+						return api.post(`/orgs/${orgId}/integration-tokens/`, {
+							name: name
+						}, Options()).then(transformData);
+					},
+					delete(orgId, tokemId) {
+						return api.delete(`/orgs/${orgId}/integration-tokens/${tokemId}/`, Options()).then(transformData);
+					},
+					getList(orgId) {
+						return api.get(`/orgs/${orgId}/integration-tokens/`, Options()).then(transformData);
+					},
 				}
 			},
 			projects: {
@@ -275,7 +324,7 @@ export default {
 					updateById(projectId, scanId) {
 						return api.put(`/projects/${projectId}/scans/${scanId}/`, Options()).then(transformData);
 					},
-					getList(projectId, mode) {
+					getList(projectId) {
 						return api.get(`/projects/${projectId}/scans/`, Options()).then(transformData);
 					},
 					getListMode(projectId, mode) {
@@ -295,7 +344,22 @@ export default {
 					getById(projectId, uploadId) {
 						return api.get(`/projects/${projectId}/uploads/${uploadId}/`, Options()).then(transformData);
 					}
-				}
+				},
+				scanPolicies: {
+					updateById(projectId, scanPolicyId, inUse, policyCode) {
+						return api.patch(`/projects/${projectId}/scan-policies/${scanPolicyId}/`, {
+							in_use: inUse,
+							policy_code: policyCode
+						}, Options()).then(transformData);
+					},
+				},
+				licensePolicies: {
+					updateById(projectId, policyCode) {
+						return api.patch(`/projects/${projectId}/license-policies/${projectId}/`, {
+							license_policy: policyCode
+						}, Options()).then(transformData);
+					},
+				},
 			},
 			scans: {
 				getList() {
@@ -309,22 +373,22 @@ export default {
 				},
 				issues: {
 					create(scanId) {
-						return api.post(`/scans/${scanId}/issues/`, Options()).then(transformData);
+						return api.post(`/scans/${scanId}/issues/`, {}, Options()).then(transformData);
 					},
 					createMode(scanId, mode) {
-						return api.post(`/scans/${scanId}/issues/${mode}/`, Options()).then(transformData);
+						return api.post(`/scans/${scanId}/issues/${mode}/`, {}, Options()).then(transformData);
 					},
 					createById(scanId, issueId) {
-						return api.post(`/scans/${scanId}/issues/${issueId}/`, Options()).then(transformData);
+						return api.post(`/scans/${scanId}/issues/${issueId}/`, {}, Options()).then(transformData);
 					},
 					createByIdMode(scanId, issueId, mode) {
 						return api.post(`/scans/${scanId}/issues/${issueId}/${mode}/`, Options()).then(transformData);
 					},
 					updateById(scanId, issueId) {
-						return api.put(`/scans/${scanId}/issues/${issueId}/`, Options()).then(transformData);
+						return api.patch(`/scans/${scanId}/issues/${issueId}/`, {}, Options()).then(transformData);
 					},
 					updateByIdMode(scanId, issueId, mode) {
-						return api.put(`/scans/${scanId}/issues/${issueId}/${mode}/`, Options()).then(transformData);
+						return api.patch(`/scans/${scanId}/issues/${issueId}/${mode}/`, {}, Options()).then(transformData);
 					},
 					getList(scanId) {
 						return api.get(`/scans/${scanId}/issues/`, Options()).then(transformData);
@@ -368,6 +432,19 @@ export default {
 					getById(scanId, summaryId) {
 						return api.get(`/scans/${scanId}/summaries/${summaryId}/`, Options()).then(transformData);
 					}
+				},
+				actions: {
+					create(scanId, issueId, issueType, priority, actionType, assignee, comment) {
+						return api.post(`/scans/${scanId}/actions/`, {
+							scanID: scanId,
+							issue_id: issueId,
+							issue_type: issueType,
+							priority: priority,
+							action_type: actionType,
+							assignee: assignee,
+							comment: comment
+						}, Options()).then(transformData);
+					}
 				}
 			},
 			teams: {
@@ -407,6 +484,14 @@ export default {
 				getList() {
 					return api.get('/user/', Options()).then(transformData);
 				},
+				getConfig() {
+					return api.get('/noti-config/', Options()).then(transformData);
+				},
+				updateConfigById(id, status) {
+					return api.patch(`/noti-config/${id}/`, {
+						enabled: status
+					}, Options()).then(transformData);
+				},
 				orgs: {
 					getList() {
 						return api.get('/user/orgs/', Options({
@@ -417,6 +502,17 @@ export default {
 					},
 					getById(orgId) {
 						return api.get(`/user/orgs/${orgId}/`, Options()).then(transformData);
+					}
+				}
+			},
+			restAuth: {
+				password: {
+					change(oldPassword, newPassword1, newPassword2) {
+						return api.post('/rest-auth/password/change/', {
+							old_password: oldPassword,
+							new_password1: newPassword1,
+							new_password2: newPassword2,
+						}, Options()).then(transformData);
 					}
 				}
 			}

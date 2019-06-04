@@ -178,7 +178,6 @@
 export default {
   data() {
     return {
-      orgId: this.$route.params.orgId,
       orgName: '',
       sourcecodeUsage: {},
       projectStatus: {
@@ -200,16 +199,29 @@ export default {
       licensesOverview: {}
     }
   },
+  computed: {
+    orgId() {
+      return this.$route.params.orgId;
+    }
+  },
   mounted() {
-    this.getProjectsOverview();
-    this.getProjectList();
-    this.getIssuesSummary();
-    this.getMemberList();
-    this.getLicensesOverview();
-    this.getSourcecodeUsage();
-    this.getOrgById();
+    this.init();
+  },
+  watch: {
+    $route() {
+      this.init();
+    }
   },
   methods: {
+    init() {
+      this.getProjectsOverview();
+      this.getProjectList();
+      this.getIssuesSummary();
+      this.getMemberList();
+      this.getLicensesOverview();
+      this.getSourcecodeUsage();
+      this.getOrgById();
+    },
     async getProjectsOverview() {
       this.projectsOverview = await this.$backend.orgs.projects.getListMode(this.orgId, 'overview');
     },
@@ -236,14 +248,18 @@ export default {
     async getMemberList() {
       this.memberList = await this.$backend.orgs.members.getList(this.orgId);
     },
-    async getLicensesOverview() {
-      this.licensesOverview = await this.$backend.orgs.licenses.getListMode(this.orgId, 'overview');
+    getLicensesOverview() {
+      this.$backend.orgs.licenses.getListMode(this.orgId, 'overview').then(data => {
+        this.licensesOverview = data;
+      }, error => {
+        this.licensesOverview = {};
+      });
     },
     async getSourcecodeUsage() {
       this.sourcecodeUsage = (await this.$backend.orgs.sourcecodeUsage.getList(this.orgId)).results[0];
     },
     async getOrgById() {
-      this.orgName = (await this.$backend.orgs.getById(this.$route.params.orgId)).name;
+      this.orgName = (await this.$backend.orgs.getById(this.orgId)).name;
     },
   }
 }

@@ -7,6 +7,7 @@
 
     <b-modal 
       id="create-team"
+      ref="create-team"
       hide-footer
     >
       <template slot="modal-title">创建新小组</template>
@@ -24,6 +25,7 @@
 
         <b-form-group label="简介:">
           <b-form-textarea
+            v-model="teamDesc"
             rows="3"
             max-rows="6"
           ></b-form-textarea>
@@ -38,38 +40,51 @@
     </b-modal>
 
     <b-table
-      :items="items"
+      :items="teamList"
       :fields="[
         { key: 'name', label: '名称' },
-        { key: 'abstract', label: '简介' }
+        { key: 'description', label: '简介' }
       ]"
       bordered
     >
-      <template slot="name" slot-scope="data">
-        <b-link to="/settings/teams/1">{{ data.item.name }}</b-link>
-      </template>
     </b-table>
   </div>
 </template>
 
 <script>
 export default {
-  computed: {
-    teamNameState() {
-      return this.teamName ? true : false;
-    }
-  },
   data() {
     return {
-      items: [
-        { name: 'test1', abstract: 'Default team for organization test1' }
-      ],
-      teamName: ''
+      teamName: '',
+      teamDesc: '',
+
+      teamList: []
     }
   },
+  computed: {
+    teamNameState() {
+      return this.teamName.length > 1 ? true : false;
+    },
+    orgId() {
+      return this.$route.params.orgId;
+    }
+  },
+  mounted() {
+    this.getTeameList();
+  },
   methods: {
+    getTeameList() {
+      this.$backend.orgs.teams.getList(this.orgId).then(res => {
+        this.teamList = res.results;
+        console.log(res);
+        
+      });
+    },
     creatTeam() {
-
+      this.$backend.orgs.teams.create(this.orgId, this.teamName, this.teamDesc).then(res => {
+        this.getTeameList();
+        this.$refs['create-team'].hide();
+      });
     }
   }
 }

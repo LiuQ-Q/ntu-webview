@@ -66,7 +66,10 @@
             <h4>项目列表</h4>
           </th>
           <th>
-            <b-button to="manage">添加项目</b-button>
+            <b-button
+              size="sm"
+              to="manage"
+            >添加项目</b-button>
           </th>
           <th colspan="5">&nbsp;</th>
         </tr>  
@@ -143,7 +146,8 @@
             <option value="binary">二进制</option>
           </b-form-select>
 
-          <b-button 
+          <b-button
+            size="sm"
             class="mt-3" 
             block
             @click="beginScan(data.item.id)"

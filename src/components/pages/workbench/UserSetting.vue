@@ -12,8 +12,8 @@
     >
       <template slot="setting">
         <div style="margin-left:5%;">
-          <p>用户名:&nbsp;{{ username }}</p>
-          <p>邮箱:&nbsp;{{ email }}</p>
+          <p>用户名:&nbsp;{{ userData.username }}</p>
+          <p>邮箱:&nbsp;{{ userData.email }}</p>
 
           <b-form-checkbox
             v-model="scanStatus"
@@ -36,19 +36,45 @@
 
             <b-form class="signin-form">
               <b-form-group label="旧密码:">
-                <b-form-input></b-form-input>
+                <b-form-input 
+                  v-model="oldPassword"
+                  type="password"
+                  :state="oldPasswordState"
+                  aria-describedby="old-password-feedback"
+                ></b-form-input>
+                <b-form-invalid-feedback id="old-password-feedback">
+                  请输入至少8位的旧密码
+                </b-form-invalid-feedback>
               </b-form-group>
 
               <b-form-group label="新密码:">
-                <b-form-input></b-form-input>
+                <b-form-input 
+                  v-model="newPassword1"
+                  :state="newPasswordState1"
+                  type="password"
+                ></b-form-input>
+                <b-form-invalid-feedback id="old-password-feedback">
+                  请输入至少8位的新密码
+                </b-form-invalid-feedback>
               </b-form-group>
 
               <b-form-group label="确认新密码:">
-                <b-form-input></b-form-input>
+                <b-form-input 
+                  v-model="newPassword2"
+                  :state="newPasswordState2"
+                  type="password"
+                ></b-form-input>
+                <b-form-invalid-feedback id="old-password-feedback">
+                  请输入至少8位的新密码
+                </b-form-invalid-feedback>
               </b-form-group>
             </b-form>
 
-            <b-button class="mt-3" block>确认修改</b-button>
+            <b-button 
+              class="mt-3" 
+              block
+              @click="changePassword"
+            >确认修改</b-button>
           </b-modal>
         </div>
       </template>
@@ -60,10 +86,70 @@
 export default {
   data() {
     return {
-      username: 'test111',
-      email: '123123@aaa.com',
+      userData: {},
+      userConfig: [],
       scanStatus: true,
-      newVulnerability: true
+      newVulnerability: true,
+      oldPassword: '',
+      newPassword1: '',
+      newPassword2: ''
+    }
+  },
+  computed: {
+    oldPasswordState() {
+      return this.oldPassword.length > 7 ? true : false;
+    },
+    newPasswordState1() {
+      return this.newPassword1.length > 7 ? true : false;
+    },
+    newPasswordState2() {
+      return this.newPassword2.length > 7 ? true : false;
+    },
+  },
+  watch: {
+    scanStatus() {
+      this.updateConfig(3, this.scanStatus);
+    },
+    newVulnerability() {
+      this.updateConfig(4, this.newVulnerability);
+    }
+  },
+  mounted() {
+    this.getUserData();
+    this.getUserConfig();
+  },
+  methods: {
+    async getUserData() {
+      this.userData = await this.$backend.user.getList();
+    },
+    async getUserConfig() {
+      this.userConfig = (await this.$backend.user.getConfig()).results;
+      
+      this.userConfig.forEach((ele) => {
+        switch (ele['notification_type']) {
+          case 'scan_status':
+            this.scanStatus = ele.enabled
+            break;
+        
+          case 'data_patch':
+            this.newVulnerability = ele.enabled
+            break;
+        
+          default:
+            break;
+        }
+      });
+    },
+    async updateConfig(id, status) {
+      this.$backend.user.updateConfigById(id, status);
+    },
+    changePassword() {
+      this.$backend.restAuth.password.change(this.oldPassword, this.newPassword1, this.newPassword2).then(res => {
+        console.log(res);
+      }, error => {
+        console.log(error);
+        
+      });
     }
   }
 }

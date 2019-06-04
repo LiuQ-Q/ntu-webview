@@ -46,7 +46,7 @@
           style="width:50%;"
         >
           <option value="none">未设置</option>
-          <option value="ignore">忽略</option>
+          <option value="ignored">忽略</option>
           <option value="to_be_fixed">待修复</option>
           <option value="fixed">已修复</option>
         </b-form-select>
@@ -75,11 +75,10 @@
           class="mb-3"
         ></b-form-textarea>
 
-        <b-button style="float:left;">提交</b-button>
-
-        <b-dropdown text="操作" style="float:left;" class="ml-3">
-          
-        </b-dropdown>
+        <b-button 
+          style="float:left;"
+          @click="submit"
+        >提交</b-button>
       </template>
     </b-table>
 
@@ -124,13 +123,13 @@ export default {
       priority: '',
       assignee: '',
       comment: '',
+      issueType: '',
 
       orgId: this.$route.params.orgId,
       projectId: this.$route.params.projectId,
       scanId: this.$route.params.scanId,
       issueId: this.$route.params.issueId,
       licenseIssues: {},
-      issuesLastAction: {},
       teamsMembers: [],
       attributesAllowed: [],
       attributesRestricted: [],
@@ -152,12 +151,14 @@ export default {
       this.licenseIssues = await this.$backend.scans.licenseIssues.getById(this.scanId, this.issueId);
     },
     async getIssuesLastAction() {
-      this.issuesLastAction = await this.$backend.scans.licenseIssues.getByIdMode(this.scanId, this.issueId, 'last-action');
+      this.$backend.scans.licenseIssues.getByIdMode(this.scanId, this.issueId, 'last-action').then(res => {
+        this.actionType = res['action_type'];
+        this.priority = res['priority'];
+        this.assignee = res['assignee'];
+        this.comment = res['comment'];
+        this.issueType = res['issue_type'];
+      });
 
-      this.actionType = this.issuesLastAction['action_type'];
-      this.priority = this.issuesLastAction['priority'];
-      this.assignee = this.issuesLastAction['assignee'];
-      this.comment = this.issuesLastAction['comment'];
     },
     async getTeamsMembers() {
       this.teamsMembers = (await this.$backend.teams.members.getList(this.orgId)).results;
@@ -182,6 +183,28 @@ export default {
           default:
             break;
         }
+      });
+    },
+    submit() {
+      this.$backend.scans.actions.create(this.scanId, this.issueId, this.issueType, this.priority, this.actionType, this.assignee, this.comment).then(res => {
+        this.$bvToast.toast('提交成功', {
+          title: null,
+          variant: 'primary',
+          toaster: 'b-toaster-top-center',
+          autoHideDelay: 2000,
+          noCloseButton: true,
+          solid: true
+        })
+      }, error => {
+        console.log(error);
+        this.$bvToast.toast('提交失败', {
+          title: null,
+          variant: 'danger',
+          toaster: 'b-toaster-top-center',
+          autoHideDelay: 2000,
+          noCloseButton: true,
+          solid: true
+        })
       });
     },
   }

@@ -25,7 +25,7 @@
       <b-navbar-nav class="ml-auto" style="float:right;"> 
         <b-nav-item-dropdown right style="float:right;">
           <template slot="button-content">用户</template>
-          <b-dropdown-item :to="`/workbench/${orgId}/user`">用户设置</b-dropdown-item>
+          <b-dropdown-item to="user">用户设置</b-dropdown-item>
           <b-dropdown-item @click="logOut">退出</b-dropdown-item>
         </b-nav-item-dropdown>
         <!-- <b-nav-item-dropdown right style="float:right;">
@@ -44,11 +44,11 @@
           <b-dropdown-item
             v-for="(org, index) in orgList"
             :key="index"
-            :href="`#/workbench/${org.id}/dashboard`"
+            :to="`/workbench/${org.id}/dashboard`"
           >{{ org.name }}</b-dropdown-item>
           <b-dropdown-divider></b-dropdown-divider>
-          <b-dropdown-item to="settings">机构设置</b-dropdown-item>
-          <b-dropdown-item to="createorg">创建机构</b-dropdown-item>
+          <b-dropdown-item :to="`/workbench/${orgId}/settings`">机构设置</b-dropdown-item>
+          <b-dropdown-item :to="`/workbench/${orgId}/createorg`">创建机构</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-nav>
     </b-container>

@@ -220,9 +220,11 @@
       >
         <b-link
           v-if="data.item['status'] === 'finished' && data.item['vul_report_status'] !== 'N.A.'"
+          @click="downloadRepo(data.item.id)"
         >下载</b-link>
         <b-link
           v-if="data.item['status'] === 'finished' && data.item['vul_report_status'] === 'N.A.'"
+          @click="exportRepo(data.item.id)"
         >导出</b-link>
       </template>
 
@@ -398,7 +400,19 @@ export default {
         this.getProjectLicensePolicies();
         this.getOrgsLicensePolicies();
       });
-    }
+    },
+    downloadRepo(scanId) {
+      this.$backend.export.licenseIssues.download(scanId);
+      this.$backend.export.libraries.download(scanId);
+      this.$backend.export.issues.download(scanId);
+
+    },
+    exportRepo(scanId) {
+      this.$backend.export.licenseIssues.export(scanId);
+      this.$backend.export.libraries.export(scanId);
+      this.$backend.export.issues.export(scanId);
+      this.getProjectScans();   
+    },
   }
 }
 </script>

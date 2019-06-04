@@ -101,7 +101,19 @@
           <th>
             <h5>组件清单</h5>
           </th>
-          <th colspan="5"></th>
+          <th>
+            <b-button
+              size="sm"
+              v-if="scansById['lib_report_status'] !== 'N.A.'"
+              @click="downloadRepo"
+            >下载</b-button>
+            <b-button
+              size="sm"
+              v-if="scansById['lib_report_status'] === 'N.A.'"
+              @click="exportRepo"
+            >导出</b-button>
+          </th>
+          <th colspan="4"></th>
         </tr>  
       </template>
 
@@ -165,7 +177,7 @@ export default {
       scanId: this.$route.params.scanId,
       scansOverview: {}, // 总览信息
       scansLibrary: [], // 组件清单
-      // scansById: {},
+      scansById: {},
       // projectById: {},
       // scansLibraryGraph: {},
       
@@ -174,7 +186,7 @@ export default {
   mounted() {
     this.getScansLibraryOverview();
     this.getScansLibrary();
-    // this.getScansById();
+    this.getScansById();
     // this.getProjectById();
     // this.getScansLibraryGraph();
   },
@@ -182,16 +194,22 @@ export default {
     async getScansLibraryOverview() {
       // 总览
       this.scansOverview = await this.$backend.scans.libraries.getListMode(this.scanId, 'overview');
+      // console.log(this.scansOverview);
+      
     },
     async getScansLibrary() {
       // 组件清单
       this.scansLibrary = (await this.$backend.scans.libraries.getList(this.scanId)).results;
+      
     },
-    // async getScansById() {
-    //   // 扫描详细信息
-    //   this.scansById = await this.$backend.scans.getById(this.scanId);
-    //   // console.log(this.scansById);
-    // },
+    getScansById() {
+      // 扫描详细信息
+      this.$backend.scans.getById(this.scanId).then(res => {
+        this.scansById = res;
+        console.log(res);
+        
+      });
+    },
     // async getProjectById() {
     //   // 
     //   this.projectById = await this.$backend.projects.getById(this.projectId);
@@ -202,6 +220,13 @@ export default {
     //   this.scansLibraryGraph = await this.$backend.scans.libraries.getListMode(this.scanId, 'dependency-graph');
     //   // console.log(this.scansLibraryGraph);
     // },
+    downloadRepo() {
+
+    },
+    exportRepo() {
+      this.$backend.export.libraries.export(this.scanId);
+      this.getScansById();   
+    },
   }
 }
 </script>

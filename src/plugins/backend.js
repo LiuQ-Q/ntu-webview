@@ -6,6 +6,10 @@ function transformData(res) {
 	return res.data;
 }
 
+function download(res) {
+
+}
+
 const api = axios.create({
 	baseURL: '/v1',
 	headers: {}
@@ -515,6 +519,66 @@ export default {
 						}, Options()).then(transformData);
 					}
 				}
+			},
+			export: {
+				licenseIssues: {
+					download(scanId) {
+						return api.get(`/scans/${scanId}/licenseissues/export/`, Options({
+							params: {
+								language: 'chinese',
+								report_format: 'pdf'
+							},
+							responseType: 'blob'
+						})).then(transformData);
+					},
+					export(scanId) {
+						return api.get(`/scans/${scanId}/licenseissues/export/`, Options({
+							params: {
+								language: 'chinese',
+								report_format: 'pdf'
+							},
+							responseType: 'blob'
+						})).then(transformData);
+					},
+				},
+				libraries: {
+					download(scanId) {
+						return api.get(`/scans/${scanId}/library-versions/export/`, Options({
+							params: {
+								language: 'chinese',
+								report_format: 'pdf'
+							},
+							responseType: 'blob'
+						})).then(transformData);
+					},
+					export(scanId) {
+						return api.get(`/scans/${scanId}/library-versions/export/`, Options({
+							params: {
+								language: 'chinese',
+								report_format: 'pdf'
+							},
+						})).then(transformData);
+					},
+				},
+				issues: {
+					download(scanId) {
+						return api.get(`/scans/${scanId}/issues/export/`, Options({
+							params: {
+								language: 'chinese',
+								report_format: 'pdf'
+							},
+						})).then(transformData);
+					},
+					export(scanId) {
+						return api.get(`/scans/${scanId}/issues/export/`, Options({
+							params: {
+								language: 'chinese',
+								report_format: 'pdf'
+							},
+						})).then(transformData);
+					},
+				},
+
 			}
 		}
 	},

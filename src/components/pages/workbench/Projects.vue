@@ -57,7 +57,7 @@
         {key: 'licenses', label: '许可证'},
         {key: 'manage', label: '操作'},
       ]" 
-      :items="projectList.results"
+      :items="projectList"
       class="text-center"
     >
       <template slot="thead-top">
@@ -170,7 +170,7 @@ export default {
       },
       scanSetting: 'source_code',
       projectsOverview: {},
-      projectList: {},
+      projectList: [],
       binaryUsage: {},
       sourcecodeUsage: {}
     }
@@ -185,9 +185,13 @@ export default {
     async getProjectsOverview() {
       this.projectsOverview = await this.$backend.orgs.projects.getListMode(this.orgId, 'overview');
     },
-    async getProjectList() {
-      this.projectList = await this.$backend.orgs.projects.getList(this.orgId);
-      console.log(this.projectList);
+    getProjectList() {
+      this.$backend.orgs.projects.getList(this.orgId).then(res => {
+        this.projectList = res.results.filter(project => {
+          return project['can_scan']
+        });
+      });
+      // console.log(this.projectList);
       
     },
     async getBinaryUsage() {

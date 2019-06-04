@@ -146,14 +146,14 @@ export default {
       this.$router.go(0);
     },
     createProject() {
-      this.$backend.orgs.projects.create(this.orgId, this.projectName, this.projectTeam, this.projectAbstract, 'upload');
+      this.$backend.orgs.projects.create(this.orgId, this.projectName, this.projectTeam, this.projectAbstract, 'upload').then(res => {
+        this.$refs['add-new-project'].hide();
+        this.$refs['upload-file'].show();
+      });
 
       this.$backend.orgs.projects.getList(this.orgId).then(res => {
         this.projectList = res.results;
       })
-
-      this.$refs['add-new-project'].hide();
-      this.$refs['upload-file'].show();
     },
     uploadFile() {
       

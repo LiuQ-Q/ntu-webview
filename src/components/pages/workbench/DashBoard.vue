@@ -67,7 +67,7 @@
             { key: 'name', label: '名称' },
             { key: 'status', label: '状态' },
           ]" 
-          :items='projectList.results'
+          :items='projectList'
         >
           <template slot="name" slot-scope="data">
             <b-link :to="`projects/${data.item.id}`">{{ data.item.name }}</b-link>
@@ -186,7 +186,7 @@ export default {
         'up_to_date': '已更新',
       },
       projectsOverview: {},
-      projectList: {},
+      projectList: [],
       latestCompletedScan: [],
       issuesCount: {
         none: 0,
@@ -225,13 +225,17 @@ export default {
     async getProjectsOverview() {
       this.projectsOverview = await this.$backend.orgs.projects.getListMode(this.orgId, 'overview');
     },
-    async getProjectList() {
-      this.projectList = await this.$backend.orgs.projects.getList(this.orgId);
-
-      this.projectList.results.forEach((result, index) => {
-        if (result.latestCompletedScan) {
-          this.latestCompletedScan.push(result.latestCompletedScan);
-        }
+    getProjectList() {
+      this.$backend.orgs.projects.getList(this.orgId).then(res => {
+        this.projectList = res.results.filter(project => {
+          return project['can_scan']
+        });
+        
+        this.projectList.forEach((result, index) => {
+          if (result.latestCompletedScan) {
+            this.latestCompletedScan.push(result.latestCompletedScan);
+          }
+        });
       });
     },
     async getIssuesSummary() {

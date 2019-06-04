@@ -160,7 +160,6 @@ export default {
     },
     async getGroupByLicense() {
       this.groupByLicense = (await this.$backend.orgs.licenses.getListMode(this.orgId, 'group-by-licenses')).results;
-      console.log(this.groupByLicense);
     }
   }
 }

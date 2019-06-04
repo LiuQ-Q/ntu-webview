@@ -21,7 +21,19 @@
           <th>
             <h4>许可证清单</h4>
           </th>
-          <th colspan="5">&nbsp;</th>
+          <th>
+            <b-button
+              size="sm"
+              v-if="scansById['lic_report_status'] !== 'N.A.'"
+              @click="downloadRepo"
+            >下载</b-button>
+            <b-button
+              size="sm"
+              v-if="scansById['lic_report_status'] === 'N.A.'"
+              @click="exportRepo"
+            >导出</b-button>
+          </th>
+          <th colspan="4">&nbsp;</th>
         </tr>  
       </template>
 
@@ -51,16 +63,31 @@ export default {
       category: {
         Permissive: '允许的',
         Restrictive: '受限的',
-      }
+      },
+      scansById: {}
     }
   },
   mounted() {
     this.getLicenseIssues();
+    this.getScansById();
   },
   methods: {
     async getLicenseIssues() {
       this.licenseIssues = (await this.$backend.scans.licenseIssues.getList(this.scanId)).results;
-    }
+    },
+    getScansById() {
+      // 扫描详细信息
+      this.$backend.scans.getById(this.scanId).then(res => {
+        this.scansById = res;
+      });
+    },
+    downloadRepo() {
+
+    },
+    exportRepo() {
+      this.$backend.export.issues.export(this.scanId);
+      this.getScansById();   
+    },
   }
 }
 </script>
@@ -68,7 +95,7 @@ export default {
 <style lang="less">
 .license-result {
   td:nth-child(1) {
-    width: 35%;
+    width: 25%;
   }
 }
 </style>

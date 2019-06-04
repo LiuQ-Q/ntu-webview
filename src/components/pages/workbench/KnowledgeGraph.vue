@@ -1,7 +1,7 @@
 <template>
   <b-container>
     <div class="mb-5">
-      <h1>关系图</h1>
+      <h1>关系图(完善中...)</h1>
     </div>
 
     <networkgraph

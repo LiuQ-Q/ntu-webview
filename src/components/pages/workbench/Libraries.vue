@@ -183,7 +183,6 @@ export default {
         { library: 'binary_test', module: 'asd', version: '1.0', vulnerabilities: 20, licenses: 'asdf', affect: 1 },
         { library: 'binary_test', module: 'asd', version: '1.0', vulnerabilities: 20, licenses: 'asdf', affect: 1 },
       ],
-      orgId: this.$route.params.orgId,
       libraryOverview: [],
       librarySummary: {},
       groupByLibrary: [],
@@ -203,33 +202,45 @@ export default {
       licTotalCount: 0
     }
   },
+  computed: {
+    orgId() {
+      return this.$route.params.orgId;
+    }
+  },
   mounted() {
     this.getLibraryOverview();
     this.getLibrarySummary();
     this.getgroupByLibrary();
   },
   methods: {
-    async getLibraryOverview() {
-      this.libraryOverview = (await this.$backend.orgs.projects.getListMode(this.orgId, 'library-version-overview')).results;
-      this.libraryOverview.forEach((ele) => {
-        this.vulCount.none += ele['none_count'];
-        this.vulCount.medium += ele['medium_count'];
-        this.vulCount.low += ele['low_count'];
-        this.vulCount.high += ele['high_count'];
-        this.vulCount.critical += ele['critical_count'];
-        this.vulTotalCount += ele['vul_total_count']
+    getLibraryOverview() {
+      this.$backend.orgs.projects.getListMode(this.orgId, 'library-version-overview').then(res => {
+        this.libraryOverview = res.results;
 
-        this.licCount.deny += ele['deny_count'];
-        this.licCount.flag += ele['flag_count'];
-        this.licCount.approve += ele['approve_count'];
-        this.licTotalCount += ele['lic_issue_total_count']
+        this.libraryOverview.forEach((ele) => {
+          this.vulCount.none += ele['none_count'];
+          this.vulCount.medium += ele['medium_count'];
+          this.vulCount.low += ele['low_count'];
+          this.vulCount.high += ele['high_count'];
+          this.vulCount.critical += ele['critical_count'];
+          this.vulTotalCount += ele['vul_total_count']
+
+          this.licCount.deny += ele['deny_count'];
+          this.licCount.flag += ele['flag_count'];
+          this.licCount.approve += ele['approve_count'];
+          this.licTotalCount += ele['lic_issue_total_count']
+        });
+      })
+    },
+    getLibrarySummary() {
+      this.$backend.orgs.libraries.getListMode(this.orgId, 'library-version-summary').then(res => {
+        this.librarySummary = res
       });
     },
-    async getLibrarySummary() {
-      this.librarySummary = await this.$backend.orgs.libraries.getListMode(this.orgId, 'library-version-summary');
-    },
-    async getgroupByLibrary() {
-      this.groupByLibrary = (await this.$backend.orgs.libraries.getListMode(this.orgId, 'group-by-library-versions')).results;
+    getgroupByLibrary() {
+      this.$backend.orgs.libraries.getListMode(this.orgId, 'group-by-library-versions').then(res => {
+        this.groupByLibrary = res.results;
+      });
     },
   }
 }

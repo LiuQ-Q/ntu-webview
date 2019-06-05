@@ -17,13 +17,13 @@
     >
       <template slot="agency" slot-scope="data">{{ orgName }}</template>
       <template slot="project" slot-scope="data">
-        <b-link to="projects">{{ projectList.count }}/{{ sourcecodeUsage['project_number_limit'] }}</b-link>
+        <b-link to="projects">{{ projectList.length }}/{{ sourcecodeUsage !== undefined ? sourcecodeUsage['project_number_limit'] : '10' }}</b-link>
       </template>
       <template slot="user" slot-scope="data">
-        <b-link to="settings">{{ memberList.count }}/{{ sourcecodeUsage['member_number_limit'] }}</b-link>
+        <b-link to="settings">{{ memberList.count }}/{{ sourcecodeUsage !== undefined ? sourcecodeUsage['member_number_limit'] : '10' }}</b-link>
       </template>
       <template slot="scan" slot-scope="data">
-        <b-link to="projects">0/{{ sourcecodeUsage['monthly_scan_limit'] }}</b-link>
+        <b-link to="projects">0/{{ sourcecodeUsage !== undefined ? sourcecodeUsage['monthly_scan_limit'] : '999999' }}</b-link>
       </template>
     </b-table>
 
@@ -69,10 +69,18 @@
           ]" 
           :items='projectList'
         >
-          <template slot="name" slot-scope="data">
+          <template 
+            slot="name" 
+            slot-scope="data"
+          >
             <b-link :to="`projects/${data.item.id}`">{{ data.item.name }}</b-link>
           </template>
-          <template slot="status" slot-scope="data">{{ projectStatus[data.item.status] }}</template>
+          <template 
+            slot="status" 
+            slot-scope="data"
+          >
+            <div :style="`color:${data.item.status === 'up_to_date' ? 'green' : (data.item.status === 'never_scanned' ? 'red' : '#F7A35C')};`">{{ projectStatus[data.item.status] }}</div>
+          </template>
         </b-table>
       </template>
       <!-- 漏洞警报 -->
@@ -222,8 +230,10 @@ export default {
       this.getSourcecodeUsage();
       this.getOrgById();
     },
-    async getProjectsOverview() {
-      this.projectsOverview = await this.$backend.orgs.projects.getListMode(this.orgId, 'overview');
+    getProjectsOverview() {
+      this.$backend.orgs.projects.getListMode(this.orgId, 'overview').then(res => {
+        this.projectsOverview = res
+      });
     },
     getProjectList() {
       this.$backend.orgs.projects.getList(this.orgId).then(res => {
@@ -238,19 +248,23 @@ export default {
         });
       });
     },
-    async getIssuesSummary() {
-      const issuesSummary = await this.$backend.orgs.issues.getListMode(this.orgId, 'issue-summary');
-      
-      Object.keys(issuesSummary).forEach((key) => {
-        this.issuesCount.none += issuesSummary[key].none;
-        this.issuesCount.medium += issuesSummary[key].medium;
-        this.issuesCount.low += issuesSummary[key].low;
-        this.issuesCount.high += issuesSummary[key].high;
-        this.issuesCount.critical += issuesSummary[key].critical;
+    getIssuesSummary() {
+      this.$backend.orgs.issues.getListMode(this.orgId, 'issue-summary').then(res => {
+
+        Object.keys(res).forEach((key) => {
+          this.issuesCount.none += res[key].none;
+          this.issuesCount.medium += res[key].medium;
+          this.issuesCount.low += res[key].low;
+          this.issuesCount.high += res[key].high;
+          this.issuesCount.critical += res[key].critical;
+        });
       });
+      
     },
-    async getMemberList() {
-      this.memberList = await this.$backend.orgs.members.getList(this.orgId);
+    getMemberList() {
+      this.$backend.orgs.members.getList(this.orgId).then(res => {
+        this.memberList = res;
+      });
     },
     getLicensesOverview() {
       this.$backend.orgs.licenses.getListMode(this.orgId, 'overview').then(data => {
@@ -259,11 +273,15 @@ export default {
         this.licensesOverview = {};
       });
     },
-    async getSourcecodeUsage() {
-      this.sourcecodeUsage = (await this.$backend.orgs.sourcecodeUsage.getList(this.orgId)).results[0];
+    getSourcecodeUsage() {
+      this.$backend.orgs.sourcecodeUsage.getList(this.orgId).then(res => {
+        this.sourcecodeUsage = res.results[0];
+      });
     },
-    async getOrgById() {
-      this.orgName = (await this.$backend.orgs.getById(this.orgId)).name;
+    getOrgById() {
+      this.$backend.orgs.getById(this.orgId).then(res => {
+        this.orgName = res.name;
+      });
     },
   }
 }

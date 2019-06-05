@@ -340,13 +340,18 @@ export default {
 				},
 				uploads: {
 					create(projectId) {
-						return api.post(`/projects/${projectId}/uploads/`, Options()).then(transformData);
+						return api.post(`/projects/${projectId}/uploads/`, {}, Options()).then(transformData);
 					},
 					getList(projectId) {
 						return api.get(`/projects/${projectId}/uploads/`, Options()).then(transformData);
 					},
 					getById(projectId, uploadId) {
 						return api.get(`/projects/${projectId}/uploads/${uploadId}/`, Options()).then(transformData);
+					}
+				},
+				upload: {
+					create(projectId) {
+						return api.post(`/projects/${projectId}/upload/`, {}, Options()).then(transformData);
 					}
 				},
 				scanPolicies: {
@@ -513,9 +518,9 @@ export default {
 				password: {
 					change(oldPassword, newPassword1, newPassword2) {
 						return api.post('/rest-auth/password/change/', {
-							old_password: oldPassword,
-							new_password1: newPassword1,
-							new_password2: newPassword2,
+							old_password: sha256(oldPassword),
+							new_password1: sha256(newPassword1),
+							new_password2: sha256(newPassword2),
 						}, Options()).then(transformData);
 					}
 				}

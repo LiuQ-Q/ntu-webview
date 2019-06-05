@@ -44,7 +44,7 @@
           <b-dropdown-item
             v-for="(org, index) in orgList"
             :key="index"
-            :to="`/workbench/${org.id}/dashboard`"
+            @click="pageJump(org.id)"
           >{{ org.name }}</b-dropdown-item>
           <b-dropdown-divider></b-dropdown-divider>
           <b-dropdown-item :to="`/workbench/${orgId}/settings`">机构设置</b-dropdown-item>
@@ -61,7 +61,6 @@ import Cookies from 'js-cookie';
 export default {
   data() {
     return {
-      orgId: this.$route.params.orgId,
       orgName: '',
       navs: [
         { name: '总览', url: "dashboard" },
@@ -74,20 +73,41 @@ export default {
       orgList: []
     }
   },
+  computed: {
+    orgId() {
+      return this.$route.params.orgId;
+    }
+  },
   mounted() {
-    this.getOrgList();
-    this.getOrgById();
+    this.init();
+  },
+  watch: {
+    $route() {
+      this.init();
+    }
   },
   methods: {
-    async getOrgList() {
-      this.orgList = (await this.$backend.orgs.getList()).results;
+    init() {
+      this.getOrgList();
+      this.getOrgById();
     },
-    async getOrgById() {
-      this.orgName = (await this.$backend.orgs.getById(this.$route.params.orgId)).name;
+    getOrgList() {
+      this.$backend.orgs.getList().then(res => {
+        this.orgList = res.results;
+      });
+    },
+    getOrgById() {
+      this.$backend.orgs.getById(this.$route.params.orgId).then(res => {
+        this.orgName = res.name;
+      });
     },
     logOut() {
       Cookies.remove('NTU_Token');
       this.$router.push('/login');
+    },
+    pageJump(id) {
+      this.$router.push(`/workbench/${id}/dashboard`);
+      this.$router.go(0);
     }
   }
 }

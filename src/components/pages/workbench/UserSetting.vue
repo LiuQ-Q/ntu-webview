@@ -28,8 +28,11 @@
 
           <b-link @click="$bvModal.show('change-password')">修改密码</b-link>
 
-          <b-modal 
+          <b-modal
             id="change-password"
+            ref="change-password"
+            @show="resetModal"
+            @hidden="resetModal"
             hide-footer
           >
             <template slot="modal-title">修改密码</template>
@@ -143,13 +146,54 @@ export default {
     async updateConfig(id, status) {
       this.$backend.user.updateConfigById(id, status);
     },
+    resetModal() {
+      this.oldPassword = '',
+      this.newPassword1 = '',
+      this.newPassword2 = ''
+    },
     changePassword() {
-      this.$backend.restAuth.password.change(this.oldPassword, this.newPassword1, this.newPassword2).then(res => {
-        console.log(res);
-      }, error => {
-        console.log(error);
-        
-      });
+      if (this.newPassword1 !== this.newPassword2) {
+        this.$bvToast.toast('请输入相同的新密码!', {
+          title: null,
+          variant: 'danger',
+          toaster: 'b-toaster-top-center',
+          autoHideDelay: 2000,
+          noCloseButton: true,
+          solid: true
+        })
+      } else if (this.oldPassword === this.newPassword1) {
+        this.$bvToast.toast('新密码不能与旧密码相同!', {
+          title: null,
+          variant: 'danger',
+          toaster: 'b-toaster-top-center',
+          autoHideDelay: 2000,
+          noCloseButton: true,
+          solid: true
+        })
+      } else {
+        this.$backend.restAuth.password.change(this.oldPassword, this.newPassword1, this.newPassword2).then(res => {
+          this.$bvToast.toast('修改成功', {
+            title: null,
+            variant: 'primary',
+            toaster: 'b-toaster-top-center',
+            autoHideDelay: 2000,
+            noCloseButton: true,
+            solid: true
+          })
+  
+          this.$refs['change-password'].hide();
+        }, error => {
+          console.log(error);
+          this.$bvToast.toast('密码错误', {
+            title: null,
+            variant: 'danger',
+            toaster: 'b-toaster-top-center',
+            autoHideDelay: 2000,
+            noCloseButton: true,
+            solid: true
+          })
+        });
+      }
     }
   }
 }

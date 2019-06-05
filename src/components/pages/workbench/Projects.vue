@@ -17,7 +17,7 @@
         <p>已更新:&nbsp;{{ projectsOverview['up-to-date'] }}</p>
         <p>未更新:&nbsp;{{ projectsOverview['outdated'] }}</p>
         <p>未扫描:&nbsp;{{ projectsOverview['never-scanned'] }}</p>
-        <p>已使用二进制流量:&nbsp;{{ Math.round(binaryUsage['block_size_scanned'] * 100) / 100 }}MB&nbsp;/&nbsp;{{ Math.round((binaryUsage['block_size_limit'] / 1024) * 100) / 100 }}GB</p>
+        <p>已使用二进制流量:&nbsp;{{ binaryUsage !== undefined ? Math.round(binaryUsage['block_size_scanned'] * 100) / 100 : 0 }}MB&nbsp;/&nbsp;{{ binaryUsage !== undefined ? Math.round((binaryUsage['block_size_limit'] / 1024) * 100) / 100 : 0 }}GB</p>
       </template>
 
       <template slot="vulnerabilities">
@@ -196,6 +196,8 @@ export default {
     },
     async getBinaryUsage() {
       this.binaryUsage = (await this.$backend.orgs.binaryUsage.getList(this.orgId)).results[0];
+      // console.log(this.binaryUsage);
+      
     },
     async getSourcecodeUsage() {
       this.sourcecodeUsage = await this.$backend.orgs.sourcecodeUsage.getList(this.orgId);

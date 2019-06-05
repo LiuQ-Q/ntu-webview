@@ -75,7 +75,7 @@
           { key: 'manage', label: '操作' }
         ]"
         :items="projectList"
-        class="mt-3"
+        class="project-manage-list mt-3"
       >
         <template 
           slot="name" 
@@ -119,7 +119,6 @@ export default {
   watch: {
     file() {
       console.log(this.file);
-      
     }
   },
   mounted() {
@@ -127,23 +126,27 @@ export default {
     this.getTeamList();
   },
   methods: {
-    async getProjectList() {
-      this.projectList = (await this.$backend.orgs.projects.getList(this.orgId)).results;
+    getProjectList() {
+      this.$backend.orgs.projects.getList(this.orgId).then(res => {
+        this.projectList = res.results;
+      });
     },
-    async getTeamList() {
-      this.teamList = (await this.$backend.orgs.teams.getList(this.orgId)).results;
-      this.projectTeam = this.teamList[0].id;
+    getTeamList() {
+      this.$backend.orgs.teams.getList(this.orgId).then(res => {
+        this.teamList = res.results;
+        this.projectTeam = res.results[0].id;
+      })
     },
     
-    async deleteProject(projectId) {
-      this.$backend.orgs.projects.deleteById(this.orgId, projectId);
-      // this.projectList = (await this.$backend.orgs.projects.getList(this.orgId)).results;
-      this.$router.go(0);
+    deleteProject(projectId) {
+      this.$backend.orgs.projects.deleteById(this.orgId, projectId).then(res => {
+        this.getProjectList();
+      })
     },
-    async updateProject(projectId) {
-      this.$backend.orgs.projects.updateById(this.orgId, projectId);
-      // this.projectList = (await this.$backend.orgs.projects.getList(this.orgId)).results;
-      this.$router.go(0);
+    updateProject(projectId) {
+      this.$backend.orgs.projects.updateById(this.orgId, projectId).then(res => {
+        this.getProjectList();
+      });
     },
     createProject() {
       this.$backend.orgs.projects.create(this.orgId, this.projectName, this.projectTeam, this.projectAbstract, 'upload').then(res => {
@@ -175,6 +178,14 @@ export default {
       height: 0;
       clear:both;
       visibility: hidden;
+    }
+  }
+
+  .project-manage-list {
+    width: 50%;
+
+    td:nth-child(1) {
+      width: 50%;
     }
   }
 }

@@ -358,10 +358,6 @@ export default {
       this.projectUploads = (await this.$backend.projects.getByIdMode(this.projectId, 'uploads')).results[0];
       // console.log(this.projectUploads);
     },
-    
-    async fileUpload() {
-
-    },
     async openScanStatus(scanId) {
       this.scansLog = await this.$backend.scans.getByIdMode(scanId, 'logs');
       
@@ -412,6 +408,10 @@ export default {
       this.$backend.export.libraries.export(scanId);
       this.$backend.export.issues.export(scanId);
       this.getProjectScans();   
+    },
+    fileUpload() {
+      console.log(this.file);
+      
     },
   }
 }

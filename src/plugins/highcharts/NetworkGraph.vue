@@ -1,5 +1,5 @@
 <template>
-  <div class="graph-container"></div>
+  <div id="container"></div>
 </template>
 
 <script>
@@ -7,10 +7,12 @@ import Highcharts from 'highcharts/highstock';
 import HighchartsMore from 'highcharts/highcharts-more';
 // import HighchartsDrilldown from 'highcharts/modules/drilldown';
 // import Highcharts3D from 'highcharts/highcharts-3d';
+import NetworkGraph from 'highcharts/modules/networkgraph';
 
-HighchartsMore(Highcharts)
+HighchartsMore(Highcharts);
 // HighchartsDrilldown(Highcharts);
 // Highcharts3D(Highcharts);
+NetworkGraph(Highcharts);
 
 export default {
   props: ['options'],
@@ -41,24 +43,34 @@ export default {
             i = 0,
             nodes = {};
           e.options.data.forEach(function (link) {
-            if (link[0] === 'Proto Indo-European') {
-              nodes['Proto Indo-European'] = {
-                id: 'Proto Indo-European',
+            if (link[0] === 'war_test') {
+              nodes['war_test'] = {
+                id: 'war_test',
                 marker: {
-                  radius: 20
+                  radius: 30
                 }
               };
               nodes[link[1]] = {
                 id: link[1],
                 marker: {
-                  radius: 10
+                  radius: 15
                 },
-                color: colors[i++]
+                color: colors[3]
               };
-            } else if (nodes[link[0]] && nodes[link[0]].color) {
+            } else if (link[0] === 'binary_test') {
+              nodes['binary_test'] = {
+                id: 'binary_test',
+                marker: {
+                  radius: 30
+                },
+                color: colors[5]
+              };
               nodes[link[1]] = {
                 id: link[1],
-                color: nodes[link[0]].color
+                marker: {
+                  radius: 15
+                },
+                color: colors[4]
               };
             }
           });

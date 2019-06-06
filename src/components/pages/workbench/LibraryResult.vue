@@ -195,19 +195,15 @@ export default {
       // 总览
       this.scansOverview = await this.$backend.scans.libraries.getListMode(this.scanId, 'overview');
       // console.log(this.scansOverview);
-      
     },
     async getScansLibrary() {
       // 组件清单
       this.scansLibrary = (await this.$backend.scans.libraries.getList(this.scanId)).results;
-      
     },
     getScansById() {
       // 扫描详细信息
       this.$backend.scans.getById(this.scanId).then(res => {
         this.scansById = res;
-        console.log(res);
-        
       });
     },
     // async getProjectById() {
@@ -221,7 +217,7 @@ export default {
     //   // console.log(this.scansLibraryGraph);
     // },
     downloadRepo() {
-
+      this.$backend.export.libraries.download(this.scanId);
     },
     exportRepo() {
       this.$backend.export.libraries.export(this.scanId);

@@ -4,7 +4,7 @@
       <h1>关系图</h1>
     </div>
 
-    <networkgraph :options="{
+    <!-- <networkgraph :options="{
       chart: {
         type: 'networkgraph',
         height: '50%'
@@ -29,7 +29,9 @@
         },
         data: graphData
       }]
-    }"></networkgraph>
+    }"></networkgraph> -->
+
+    <relationgraph :options="graphData"></relationgraph>
   </b-container>
 </template>
 
@@ -52,27 +54,30 @@ export default {
   methods: {
     async getKnowledgeGraph() {
       this.$backend.orgs.knowledgeGraph.getList(this.orgId).then(res => {
-        // console.log(res);
 
-        const data = res.nodes.filter(node => {
-          return node.properties.type !== 'project';
-        })
+        console.log(res);
+
+        this.graphData = res;
+
+        // const data = res.nodes.filter(node => {
+        //   return node.properties.type !== 'project';
+        // })
 
         
-        data.forEach((ele, index) => {
-          if (index > 41 && index < 56) {
-            this.graphData.push([
-              res.nodes[1].label,
-              ele.label
-            ])
-          } else {
-            this.graphData.push([
-              res.nodes[0].label,
-              ele.label
-            ])
-          }
-        });
-        console.log(this.graphData);
+        // data.forEach((ele, index) => {
+        //   if (index > 41 && index < 56) {
+        //     this.graphData.push([
+        //       res.nodes[1].label,
+        //       ele.label
+        //     ])
+        //   } else {
+        //     this.graphData.push([
+        //       res.nodes[0].label,
+        //       ele.label
+        //     ])
+        //   }
+        // });
+        // console.log(this.graphData);
       });
 
     }

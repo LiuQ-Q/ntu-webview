@@ -82,10 +82,10 @@ export default {
       });
     },
     downloadRepo() {
-
+      this.$backend.export.licenseIssues.download(this.scanId);
     },
     exportRepo() {
-      this.$backend.export.issues.export(this.scanId);
+      this.$backend.export.licenseIssues.export(this.scanId);
       this.getScansById();   
     },
   }

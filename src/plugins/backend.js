@@ -1,13 +1,43 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { sha256 } from 'js-sha256';
+import b64toBlob from 'b64-to-blob';
 
 function transformData(res) {
 	return res.data;
 }
 
 function download(res) {
+	if (window.Blob) {
+		const b64Data = res.data.replace(/\n/g, '');
+		const contentType = 'application/pdf';
 
+		const blobData = b64toBlob(b64Data, contentType);
+
+		if(window.navigator.msSaveOrOpenBlob){// 兼容IE9以上
+			navigator.msSaveBlob(blobData, res.config.params.filename);
+		} else {
+			const downloadElement = document.createElement('a');
+			const url = window.URL.createObjectURL(blobData);
+			downloadElement.style.display = 'none';
+			downloadElement.href = url;
+			downloadElement.download = res.config.params.filename;
+			document.body.appendChild(downloadElement);
+			downloadElement.click();
+
+			document.body.removeChild(downloadElement);
+			window.URL.revokeObjectURL(url);
+		}
+	} else {
+		this.$bvToast.toast('请使用至少 ie10 或 更高级浏览器!', {
+			title: null,
+			variant: 'danger',
+			toaster: 'b-toaster-top-center',
+			autoHideDelay: 2000,
+			noCloseButton: true,
+			solid: true
+		})
+	}
 }
 
 const api = axios.create({
@@ -538,13 +568,13 @@ export default {
 			export: {
 				licenseIssues: {
 					download(scanId) {
-						return api.get(`/scans/${scanId}/licenseissues/export/`, Options({
+						api.get(`/scans/${scanId}/licenseissues/export/`, Options({
 							params: {
 								language: 'chinese',
-								report_format: 'pdf'
+								report_format: 'pdf',
+								filename: `scan_${scanId}_license.pdf`
 							},
-							responseType: 'blob'
-						})).then(transformData);
+						})).then(download);
 					},
 					export(scanId) {
 						return api.get(`/scans/${scanId}/licenseissues/export/`, Options({
@@ -552,19 +582,18 @@ export default {
 								language: 'chinese',
 								report_format: 'pdf'
 							},
-							responseType: 'blob'
 						})).then(transformData);
 					},
 				},
 				libraries: {
 					download(scanId) {
-						return api.get(`/scans/${scanId}/library-versions/export/`, Options({
+						api.get(`/scans/${scanId}/library-versions/export/`, Options({
 							params: {
 								language: 'chinese',
-								report_format: 'pdf'
+								report_format: 'pdf',
+								filename: `scan_${scanId}_library.pdf`
 							},
-							responseType: 'blob'
-						})).then(transformData);
+						})).then(download);
 					},
 					export(scanId) {
 						return api.get(`/scans/${scanId}/library-versions/export/`, Options({
@@ -577,12 +606,13 @@ export default {
 				},
 				issues: {
 					download(scanId) {
-						return api.get(`/scans/${scanId}/issues/export/`, Options({
+						api.get(`/scans/${scanId}/issues/export/`, Options({
 							params: {
 								language: 'chinese',
-								report_format: 'pdf'
+								report_format: 'pdf',
+								filename: `scan_${scanId}_issue.pdf`
 							},
-						})).then(transformData);
+						})).then(download);
 					},
 					export(scanId) {
 						return api.get(`/scans/${scanId}/issues/export/`, Options({

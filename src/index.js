@@ -18,8 +18,8 @@ import './assets/css/main.less';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-import 'classlist-polyfill';
 import 'js-polyfills/html';
+import 'js-polyfills/dom';
 
 
 

@@ -523,6 +523,16 @@ export default {
 							new_password2: sha256(newPassword2),
 						}, Options()).then(transformData);
 					}
+				},
+				registration: {
+					create(username, email, newPassword1, newPassword2) {
+						return api.post('/rest-auth/registration/', {
+							username: username,
+							email: email,
+							password1: sha256(newPassword1),
+							password2: sha256(newPassword2),
+						}, Options()).then(transformData);
+					}
 				}
 			},
 			export: {

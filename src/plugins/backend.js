@@ -369,8 +369,13 @@ export default {
 					}
 				},
 				uploads: {
-					create(projectId) {
-						return api.post(`/projects/${projectId}/uploads/`, {}, Options()).then(transformData);
+					create(projectId, downloadLink, fileModified, fileSize, fileName) {
+						return api.post(`/projects/${projectId}/uploads/`, {
+							download_link: downloadLink,
+							file_modified: fileModified,
+							file_size: fileSize,
+							filename: fileName
+						}, Options()).then(transformData);
 					},
 					getList(projectId) {
 						return api.get(`/projects/${projectId}/uploads/`, Options()).then(transformData);
@@ -568,7 +573,7 @@ export default {
 			export: {
 				licenseIssues: {
 					download(scanId) {
-						api.get(`/scans/${scanId}/licenseissues/export/`, Options({
+						return api.get(`/scans/${scanId}/licenseissues/export/`, Options({
 							params: {
 								language: 'chinese',
 								report_format: 'pdf',
@@ -587,7 +592,7 @@ export default {
 				},
 				libraries: {
 					download(scanId) {
-						api.get(`/scans/${scanId}/library-versions/export/`, Options({
+						return api.get(`/scans/${scanId}/library-versions/export/`, Options({
 							params: {
 								language: 'chinese',
 								report_format: 'pdf',
@@ -606,7 +611,7 @@ export default {
 				},
 				issues: {
 					download(scanId) {
-						api.get(`/scans/${scanId}/issues/export/`, Options({
+						return api.get(`/scans/${scanId}/issues/export/`, Options({
 							params: {
 								language: 'chinese',
 								report_format: 'pdf',
@@ -624,6 +629,11 @@ export default {
 					},
 				},
 
+			},
+			upload: {
+				create(formData) {
+					return api.post('/upload/', formData, Options()).then(transformData);
+				},
 			}
 		}
 	},

@@ -254,6 +254,8 @@
 </template>
 
 <script>
+import dateFormat from 'dateformat';
+
 export default {
   data() {
     return {
@@ -267,7 +269,6 @@ export default {
       projectSelected: [],
       scheduledId: '',
       projectScans: [], // 扫描历史相关
-      projectScanPolicies: [],
       projectById: {}, // 项目信息
       orgsSourcecode: {},
       orgsLicensePolicies: [], // 许可证政策
@@ -307,42 +308,48 @@ export default {
     this.getProjectUploads();
   },
   methods: {
-    async getProjectScans() {
+    getProjectScans() {
       // 扫描历史列表
-      this.projectScans = (await this.$backend.projects.scans.getList(this.projectId)).results;
+      this.$backend.projects.scans.getList(this.projectId).then(res => {
+        this.projectScans = res.results;
+      });
       // console.log(this.projectScans);
     },
-    async getProjectById() {
+    getProjectById() {
       // 项目信息
-      this.projectById = await this.$backend.projects.getById(this.projectId);
+      this.$backend.projects.getById(this.projectId).then(res => {
+        this.projectById = res;
+      });
       // console.log(this.projectById);
     },
-    async getProjectScanPolicies() {
+    getProjectScanPolicies() {
       // 扫描设置相关
-      this.projectScanPolicies = (await this.$backend.projects.getByIdMode(this.projectId, 'scan-policies')).results;
-
-      this.projectScanPolicies.forEach((ele) => {
-        if (ele['policy_type'] === 'scheduled') {
-          this.scheduledId = ele.id;
-          this.regularScanStatus = ele['in_use'];
-          this.policyCode = ele['policy_code'];
-        }
+      this.$backend.projects.getByIdMode(this.projectId, 'scan-policies').then(res => {
+        res.results.forEach((ele) => {
+          if (ele['policy_type'] === 'scheduled') {
+            this.scheduledId = ele.id;
+            this.regularScanStatus = ele['in_use'];
+            this.policyCode = ele['policy_code'];
+          }
+        });
       });
     },
-    async getProjectLicensePolicies() {
+    getProjectLicensePolicies() {
       // 当前使用的政策
-      this.licensePolicy = (await this.$backend.projects.getByIdMode(this.projectId, 'license-policies')).results[0]['license_policy'];
+      this.$backend.projects.getByIdMode(this.projectId, 'license-policies').then(res => {
+        this.licensePolicy = res.results[0]['license_policy'];
+      });
       // console.log(this.licensePolicy);
-      
     },
-    async getOrgsSourcecode() {
+    getOrgsSourcecode() {
       // 
-      this.orgsSourcecode = await this.$backend.orgs.getByIdMode(this.orgId, 'sourcecode-usage');
+      this.$backend.orgs.getByIdMode(this.orgId, 'sourcecode-usage').then(res => {
+        this.orgsSourcecode = res
+      });
       // console.log(this.orgsSourcecode);
     },
-    async getOrgsLicensePolicies() {
+    getOrgsLicensePolicies() {
       // 许可证政策
-      this.orgsLicensePolicies = (await this.$backend.orgs.getByIdMode(this.orgId, 'license-policies')).results;
       this.$backend.orgs.getByIdMode(this.orgId, 'license-policies').then(res => {
         this.orgsLicensePolicies = res.results;
 
@@ -353,30 +360,35 @@ export default {
         })
       });
     },
-    async getProjectUploads() {
+    getProjectUploads() {
       // 上传文件相关
-      this.projectUploads = (await this.$backend.projects.getByIdMode(this.projectId, 'uploads')).results[0];
+      this.$backend.projects.getByIdMode(this.projectId, 'uploads').then(res => {
+        this.projectUploads = res.results[0];
+      });
       // console.log(this.projectUploads);
     },
-    async openScanStatus(scanId) {
-      this.scansLog = await this.$backend.scans.getByIdMode(scanId, 'logs');
-      
-      this.$refs['modal-scan-status'].show();
+    openScanStatus(scanId) {
+      this.$backend.scans.getByIdMode(scanId, 'logs').then(res => {
+        this.scansLog = res;
+        this.$refs['modal-scan-status'].show();
+      });
     },
     compare() {
       this.$router.push(`24/compare/${this.projectSelected.join('&')}`)
     },
-    async deleteProject(projectId) {
+    deleteProject(projectId) {
       // 隐藏项目
-      this.$backend.orgs.projects.deleteById(this.orgId, projectId);
-      this.projectById = await this.$backend.projects.getById(this.projectId);
+      this.$backend.orgs.projects.deleteById(this.orgId, projectId).then(res => {
+        this.getProjectById();
+      });
     },
-    async updateProject(projectId) {
+    updateProject(projectId) {
       // 取消隐藏项目
-      this.$backend.orgs.projects.updateById(this.orgId, projectId);
-      this.projectById = await this.$backend.projects.getById(this.projectId);
+      this.$backend.orgs.projects.updateById(this.orgId, projectId).then(res => {
+        this.getProjectById();
+      });
     },
-    async regularScan() {
+    regularScan() {
       this.$backend.projects.scanPolicies.updateById(this.projectId,this.scheduledId, this.regularScanStatus, this.policyCode);
     },
     policySetting() {
@@ -398,20 +410,43 @@ export default {
       });
     },
     downloadRepo(scanId) {
-      this.$backend.export.licenseIssues.download(scanId);
-      this.$backend.export.libraries.download(scanId);
-      this.$backend.export.issues.download(scanId);
-
+      Promise.all([
+        this.$backend.export.licenseIssues.download(scanId),
+        this.$backend.export.libraries.download(scanId),
+        this.$backend.export.issues.download(scanId),
+      ]);
     },
     exportRepo(scanId) {
-      this.$backend.export.licenseIssues.export(scanId);
-      this.$backend.export.libraries.export(scanId);
-      this.$backend.export.issues.export(scanId);
-      this.getProjectScans();   
+      Promise.all([
+        this.$backend.export.licenseIssues.export(scanId),
+        this.$backend.export.libraries.export(scanId),
+        this.$backend.export.issues.export(scanId),
+      ]).then(res => {
+        this.getProjectScans();   
+      });
     },
     fileUpload() {
-      console.log(this.file);
+      const fileModified = dateFormat(this.file.lastModifiedDate, 'yyyy-mm-dd HH:mm:ss');
+      const fileSize = this.file.size / (1024*1024);
       
+      const formData = new FormData();
+      formData.append('file', this.file);
+
+      Promise.all([
+        this.$backend.upload.create(formData),
+        this.$backend.projects.uploads.create(this.projectId, this.file.name, fileModified, fileSize, this.file.name),
+        this.$backend.projects.uploads.getList(this.projectId)
+      ]).then(res => {
+        this.$bvToast.toast('文件上传成功', {
+          title: null,
+          variant: 'primary',
+          toaster: 'b-toaster-top-center',
+          autoHideDelay: 2000,
+          noCloseButton: true,
+          solid: true
+        })
+        this.getProjectUploads();
+      });
     },
   }
 }

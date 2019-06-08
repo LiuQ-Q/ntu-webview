@@ -159,7 +159,26 @@ export default {
       })
     },
     uploadFile() {
+      const fileModified = dateFormat(this.file.lastModifiedDate, 'yyyy-mm-dd HH:mm:ss');
+      const fileSize = this.file.size / (1024*1024);
       
+      const formData = new FormData();
+      formData.append('file', this.file);
+
+      Promise.all([
+        this.$backend.upload.create(formData),
+        this.$backend.projects.uploads.create(this.projectId, this.file.name, fileModified, fileSize, this.file.name),
+        this.$backend.projects.uploads.getList(this.projectId)
+      ]).then(res => {
+        this.$bvToast.toast('文件上传成功', {
+          title: null,
+          variant: 'primary',
+          toaster: 'b-toaster-top-center',
+          autoHideDelay: 2000,
+          noCloseButton: true,
+          solid: true
+        })
+      });
     },
   }
 }

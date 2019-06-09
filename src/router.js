@@ -26,6 +26,7 @@ import VulnerabilityResult from './components/pages/workbench/VulnerabilityResul
 import VulnerabilityDetail from './components/pages/workbench/VulnerabilityDetail.vue';
 import LicenseResult from './components/pages/workbench/LicenseResult.vue';
 import LicenseDetail from './components/pages/workbench/LicenseDetail.vue';
+import LicensePolicy from './components/pages/workbench/LicensePolicy.vue';
 
 import Organizations from './components/pages/workbench/settings/Organizations.vue';
 import Teams from './components/pages/workbench/settings/Teams.vue';
@@ -147,6 +148,10 @@ const router = new VueRouter({
         {
           path: 'projects/:projectId/licenses/:scanId/issue/:issueId',
           component: LicenseDetail
+        },
+        {
+          path: 'policies/:policyId',
+          component: LicensePolicy
         },
         {
           path: 'user',

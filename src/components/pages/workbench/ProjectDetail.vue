@@ -90,6 +90,9 @@
         <div v-if="!defaultPolicyCode.includes(licensePolicy)">
           <b-link @click="deletePolicy">删除政策</b-link>
         </div>
+        <div>
+          <b-link :to="`/workbench/${orgId}/policies/${licensePolicy}`">查看政策</b-link>
+        </div>
 
         <b-modal 
           id="modal-policy"
@@ -338,8 +341,8 @@ export default {
       // 当前使用的政策
       this.$backend.projects.getByIdMode(this.projectId, 'license-policies').then(res => {
         this.licensePolicy = res.results[0]['license_policy'];
+        // console.log(this.licensePolicy);
       });
-      // console.log(this.licensePolicy);
     },
     getOrgsSourcecode() {
       // 
@@ -352,7 +355,8 @@ export default {
       // 许可证政策
       this.$backend.orgs.getByIdMode(this.orgId, 'license-policies').then(res => {
         this.orgsLicensePolicies = res.results;
-
+        // console.log(res);
+        
         res.results.forEach(ele => {
           if (ele['is_default']) {
             this.defaultPolicyCode.push(ele['policy_code']);

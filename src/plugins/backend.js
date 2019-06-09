@@ -317,6 +317,9 @@ export default {
 					delete(orgId, policyCode) {
 						return api.delete(`/orgs/${orgId}/license-policies/${policyCode}/`, Options()).then(transformData);
 					},
+					getByIdMode(orgId, policyCode, mode) {
+						return api.get(`/orgs/${orgId}/license-policies/${policyCode}/${mode}/`, Options()).then(transformData);
+					},
 				},
 				tokens: {
 					create(orgId, name) {
@@ -634,7 +637,17 @@ export default {
 				create(formData) {
 					return api.post('/upload/', formData, Options()).then(transformData);
 				},
-			}
+			},
+			licenses: {
+				getList() {
+					return api.get('/licenses/', Options()).then(transformData);
+				},
+				attributes: {
+					getList() {
+						return api.get('/license-attributes/', Options()).then(transformData);
+					},
+				}
+			},
 		}
 	},
 	getOrgId: function() {

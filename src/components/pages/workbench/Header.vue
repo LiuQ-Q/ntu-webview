@@ -12,7 +12,7 @@
         >
       </a>
 
-      <b-navbar-brand href="/">{{ $t('header') }}</b-navbar-brand>
+      <b-navbar-brand href="/" style="margin-right:0;">{{ $t('header') }}</b-navbar-brand>
 
       <b-link
         v-for="(nav, index) in navs"
@@ -20,11 +20,16 @@
         :to="`/workbench/${orgId}/${nav.url}`"
         class="ml-4"
         style="color:rgba(255, 255, 255, 0.5);"
-      >{{ nav.name }}</b-link>
+      ><i 
+        :class="`${nav.icon} pr-2`"
+        style="color:#ddd;"
+      ></i>{{ nav.name }}</b-link>
 
       <b-navbar-nav class="ml-auto" style="float:right;"> 
         <b-nav-item-dropdown right style="float:right;">
-          <template slot="button-content">用户</template>
+          <template slot="button-content">
+            <i class="fas fa-user" style="color:#ddd;"></i>
+          </template>
           <b-dropdown-item to="user">用户设置</b-dropdown-item>
           <b-dropdown-item @click="logOut">退出</b-dropdown-item>
         </b-nav-item-dropdown>
@@ -63,12 +68,12 @@ export default {
     return {
       orgName: '',
       navs: [
-        { name: '总览', url: "dashboard" },
-        { name: '项目', url: "projects" },
-        { name: '组件', url: "libraries" },
-        { name: '漏洞', url: "vulnerabilities" },
-        { name: '许可证', url: "licenses" },
-        { name: '关系网', url: "knowledge-graph" }
+        { name: '总览', url: 'dashboard', icon: 'fas fa-align-center' },
+        { name: '项目', url: 'projects', icon: 'fas fa-project-diagram' },
+        { name: '组件', url: 'libraries', icon: 'fas fa-cogs' },
+        { name: '漏洞', url: 'vulnerabilities', icon: 'fas fa-bug' },
+        { name: '许可证', url: 'licenses', icon: 'fas fa-award' },
+        { name: '关系表', url: 'relational-tables', icon: 'fas fa-list-ul' }
       ],
       orgList: []
     }

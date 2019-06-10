@@ -13,7 +13,7 @@ import Projects from './components/pages/workbench/Projects.vue';
 import Libraries from './components/pages/workbench/Libraries.vue';
 import Vulnerabilities from './components/pages/workbench/Vulnerabilities.vue'
 import Licenses from './components/pages/workbench/Licenses.vue';
-import KnowledgeGraph from './components/pages/workbench/KnowledgeGraph.vue'
+import RelationalTables from './components/pages/workbench/RelationalTables.vue'
 import Settings from './components/pages/workbench/Settings.vue';
 import CreateOrg from './components/pages/workbench/CreateOrg.vue';
 
@@ -72,8 +72,8 @@ const router = new VueRouter({
           component: Licenses
         },
         {
-          path: 'knowledge-graph',
-          component: KnowledgeGraph
+          path: 'relational-tables',
+          component: RelationalTables
         },
         {
           path: 'manage',

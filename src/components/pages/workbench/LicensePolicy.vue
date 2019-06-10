@@ -1,8 +1,14 @@
 <template>
   <b-container>
-    <div class="mb-5">
+    <div class="mb-3">
       <h1>许可证政策</h1>
     </div>
+
+    <!-- <b-button 
+      size="sm"
+      class="mb-3"
+      @click="$bvModal.show('modal-add-policy')"
+    >添加政策</b-button> -->
 
     <b-table
       :fields="[
@@ -11,49 +17,93 @@
         { key: 'deny', label: '受限的' },
       ]"
       :items="[{}]"
-      class="text-center"
-      bordered
+      class="license-policy-list"
       small
     >
-      <!-- <template slot="thead-top">
+      <template slot="thead-top">
         <tr>
-          <th colspan="1">&nbsp;</th>
           <th>
-            <b-button 
-              size="sm"
-              @click="$bvModal.show('modal-add-policy')"
-            >添加政策</b-button>
+            <h3>许可证</h3>
           </th>
-          <th colspan="1">&nbsp;</th>
+          <th colspan="2">&nbsp;</th>
         </tr>  
-      </template> -->
+      </template>
+      
       <template slot="approve">
         <div
+          v-if="approvePolicy.length !== 0"
           v-for="(policy, index) in approvePolicy"
           :key="index"
-        >
-          {{ policy['item_name'] }}
-        </div>
+        >{{ policy['item_name'] }}</div>
+        <div v-if="approvePolicy.length === 0">无</div>
       </template>
 
       <template slot="flag">
         <div
-          v-for="(policy, index) in approvePolicy"
+          v-if="flagPolicy.length !== 0"
+          v-for="(policy, index) in flagPolicy"
           :key="index"
-        >
-          {{ policy['item_name'] }}
-        </div>
+        >{{ policy['item_name'] }}</div>
+        <div v-if="flagPolicy.length === 0">无</div>
       </template>
 
       <template slot="deny">
         <div
-          v-for="(policy, index) in approvePolicy"
+          v-if="denyPolicy.length !== 0"
+          v-for="(policy, index) in denyPolicy"
           :key="index"
-        >
-          {{ policy['item_name'] }}
-        </div>
+        >{{ policy['item_name'] }}</div>
+        <div v-if="denyPolicy.length === 0">无</div>
       </template>
     </b-table>
+    
+    <b-table
+      :fields="[
+        { key: 'approve', label: '被允许的' },
+        { key: 'flag', label: '被标记的' },
+        { key: 'deny', label: '受限的' },
+      ]"
+      :items="[{}]"
+      class="license-policy-list"
+      small
+    >
+      <template slot="thead-top">
+        <tr>
+          <th>
+            <h3>许可证属性</h3>
+          </th>
+          <th colspan="2">&nbsp;</th>
+        </tr>  
+      </template>
+
+      <template slot="approve">
+        <div
+          v-if="approvePolicyAttr.length !== 0"
+          v-for="(policy, index) in approvePolicyAttr"
+          :key="index"
+        >{{ policy['item_name'] }}</div>
+        <div v-if="approvePolicyAttr.length === 0">无</div>
+      </template>
+
+      <template slot="flag">
+        <div
+          v-if="flagPolicyAttr.length !== 0"
+          v-for="(policy, index) in flagPolicyAttr"
+          :key="index"
+        >{{ policy['item_name'] }}</div>
+        <div v-if="flagPolicyAttr.length === 0">无</div>
+      </template>
+
+      <template slot="deny">
+        <div
+          v-if="denyPolicyAttr.length !== 0"
+          v-for="(policy, index) in denyPolicyAttr"
+          :key="index"
+        >{{ policy['item_name'] }}</div>
+        <div v-if="denyPolicyAttr.length === 0">无</div>
+      </template>
+    </b-table>
+
     <b-modal 
       id="modal-add-policy"
       ref="modal-add-policy"
@@ -168,6 +218,14 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="less">
+.license-policy-list {
+  td {
+    width: 33.33%;
+    div {
+      height: 50px;
+      border-bottom: 1px solid #ccc;
+    }
+  }
+}
 </style>

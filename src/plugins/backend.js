@@ -161,8 +161,11 @@ export default {
 					return api.get(`/orgs/${orgId}/${mode}/`, Options()).then(transformData);
 				},
 				members: {
-					create(orgId) {
-						return api.post(`/orgs/${orgId}/members/`, Options()).then(transformData);
+					create(orgId, email) {
+						return api.post(`/orgs/${orgId}/members/`, {
+							email: email,
+							role: 'member'
+						}, Options()).then(transformData);
 					},
 					deleteById(orgId, memberId) {
 						return api.delete(`/orgs/${orgId}/members/${memberId}/`, Options()).then(transformData);

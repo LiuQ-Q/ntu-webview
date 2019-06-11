@@ -317,11 +317,27 @@ export default {
 							description: description
 						}, Options()).then(transformData);
 					},
+					createRules(orgId, policyId, ruleType, itemId, action, attributeCategory = '') {
+						return api.post(`/orgs/${orgId}/license-policies/${policyId}/license-policy-rules/`, {
+							action: action,
+							activeOrgId: orgId,
+							item_id: itemId,
+							licensePolicyCode: policyId,
+							rule_type: ruleType,
+							attribute_category: attributeCategory
+						}, Options()).then(transformData);
+					},
+					deleteRules(orgId, policyCode, ruleId) {
+						return api.delete(`/orgs/${orgId}/license-policies/${policyCode}/license-policy-rules/${ruleId}/`, Options()).then(transformData);
+					},
 					delete(orgId, policyCode) {
 						return api.delete(`/orgs/${orgId}/license-policies/${policyCode}/`, Options()).then(transformData);
 					},
 					getByIdMode(orgId, policyCode, mode) {
 						return api.get(`/orgs/${orgId}/license-policies/${policyCode}/${mode}/`, Options()).then(transformData);
+					},
+					getById(orgId, policyCode) {
+						return api.get(`/orgs/${orgId}/license-policies/${policyCode}/`, Options()).then(transformData);
 					},
 				},
 				tokens: {

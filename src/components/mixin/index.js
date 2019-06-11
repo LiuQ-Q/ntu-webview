@@ -1,4 +1,5 @@
 import dateFormat from 'dateformat';
+import Time from 'time.js';
 
 const minix = {
 	methods: {
@@ -8,6 +9,13 @@ const minix = {
 			}
 
 			return dateFormat(time, 'yyyy/mm/dd HH:mm:ss');
+		},
+		ago(time) {
+			if (!time) {
+				return '-------------';
+			}
+
+			return Time.ago(time);
 		}
 	}
 };

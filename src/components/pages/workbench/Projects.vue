@@ -85,7 +85,7 @@
       <template 
         slot="last_update"
         slot-scope="data"
-      >{{ Math.round((Date.now() - Date.parse(data.item['modified'])) / (1000 * 60 * 60 *24)) }}&nbsp;天前</template>
+      >{{ ago(Date.parse(data.item['modified'])) }}</template>
 
       <template 
         slot="status"
@@ -191,8 +191,6 @@ export default {
           return project['can_scan']
         });
       });
-      // console.log(this.projectList);
-      
     },
     async getBinaryUsage() {
       this.binaryUsage = (await this.$backend.orgs.binaryUsage.getList(this.orgId)).results[0];

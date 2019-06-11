@@ -173,7 +173,7 @@
       <template 
         slot="last" 
         slot-scope="data"
-      >{{ Math.round((Date.now() - Date.parse(data.item['scan_modified'])) / (1000 * 60 * 60 *24)) }}&nbsp;天前</template>
+      >{{ ago(Date.parse(data.item['scan_modified'])) }}</template>
 
       <template 
         slot="scan"
@@ -196,7 +196,7 @@
       class="vul-by-issue text-center"
     >
       <template slot="thead-top">
-        <h4>按组件分类</h4>
+        <h4>按问题分类</h4>
       </template>
 
       <template 

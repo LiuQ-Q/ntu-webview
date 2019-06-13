@@ -7,37 +7,16 @@ function transformData(res) {
 	return res.data;
 }
 
-function download(res) {
-	if (window.Blob) {
-		const b64Data = res.data.replace(/\n/g, '');
-		const contentType = 'application/pdf';
+function downloadReport(scanId, filename, reportType) {
+	const downloadElement = document.createElement('a');
+	const url = `/mock/report/${scanId}/${filename}/${reportType}?token=${Cookies.get('NTU_Token')}`;
 
-		const blobData = b64toBlob(b64Data, contentType);
+	downloadElement.style.display = 'none';
+	downloadElement.href = url;
+	document.body.appendChild(downloadElement);
+	downloadElement.click();
 
-		if(window.navigator.msSaveOrOpenBlob){// 兼容IE9以上
-			navigator.msSaveBlob(blobData, res.config.params.filename);
-		} else {
-			const downloadElement = document.createElement('a');
-			const url = window.URL.createObjectURL(blobData);
-			downloadElement.style.display = 'none';
-			downloadElement.href = url;
-			downloadElement.download = res.config.params.filename;
-			document.body.appendChild(downloadElement);
-			downloadElement.click();
-
-			document.body.removeChild(downloadElement);
-			window.URL.revokeObjectURL(url);
-		}
-	} else {
-		this.$bvToast.toast('请使用至少 ie10 或 更高级浏览器!', {
-			title: null,
-			variant: 'danger',
-			toaster: 'b-toaster-top-center',
-			autoHideDelay: 2000,
-			noCloseButton: true,
-			solid: true
-		})
-	}
+	document.body.removeChild(downloadElement);
 }
 
 const api = axios.create({
@@ -595,13 +574,7 @@ export default {
 			export: {
 				licenseIssues: {
 					download(scanId) {
-						return api.get(`/scans/${scanId}/licenseissues/export/`, Options({
-							params: {
-								language: 'chinese',
-								report_format: 'pdf',
-								filename: `scan_${scanId}_license.pdf`
-							},
-						})).then(download);
+						downloadReport(scanId, `scan_${scanId}_license.pdf`, 'licenseissues');
 					},
 					export(scanId) {
 						return api.get(`/scans/${scanId}/licenseissues/export/`, Options({
@@ -614,13 +587,7 @@ export default {
 				},
 				libraries: {
 					download(scanId) {
-						return api.get(`/scans/${scanId}/library-versions/export/`, Options({
-							params: {
-								language: 'chinese',
-								report_format: 'pdf',
-								filename: `scan_${scanId}_library.pdf`
-							},
-						})).then(download);
+						downloadReport(scanId, `scan_${scanId}_library.pdf`, 'library-versions');
 					},
 					export(scanId) {
 						return api.get(`/scans/${scanId}/library-versions/export/`, Options({
@@ -633,13 +600,7 @@ export default {
 				},
 				issues: {
 					download(scanId) {
-						return api.get(`/scans/${scanId}/issues/export/`, Options({
-							params: {
-								language: 'chinese',
-								report_format: 'pdf',
-								filename: `scan_${scanId}_issue.pdf`
-							},
-						})).then(download);
+						downloadReport(scanId, `scan_${scanId}_library.pdf`, 'issues');						
 					},
 					export(scanId) {
 						return api.get(`/scans/${scanId}/issues/export/`, Options({

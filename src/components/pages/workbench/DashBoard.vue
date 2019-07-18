@@ -85,7 +85,13 @@
       </template>
       <!-- 漏洞警报 -->
       <template slot="vulnerabilities">
-        <highcharts :options="{
+        <highcharts 
+          v-if="!(issuesCount['critical'] === 0 
+            && issuesCount['high'] === 0 
+            && issuesCount['medium'] === 0 
+            && issuesCount['low'] === 0 
+            && issuesCount['none'] === 0)"
+          :options="{
           chart: {
             type: 'pie'
           },
@@ -111,7 +117,20 @@
           }
         }"></highcharts>
 
+        <span 
+          v-if="issuesCount['critical'] === 0 
+            && issuesCount['high'] === 0 
+            && issuesCount['medium'] === 0 
+            && issuesCount['low'] === 0 
+            && issuesCount['none'] === 0"
+        >未发现问题</span>
+
         <b-table
+          v-if="!(issuesCount['critical'] === 0 
+            && issuesCount['high'] === 0 
+            && issuesCount['medium'] === 0 
+            && issuesCount['low'] === 0 
+            && issuesCount['none'] === 0)"
           :fields="[
             { key: 'name', label: '名称' },
             { key: 'problem', label: '问题' },
@@ -133,7 +152,12 @@
       </template>
       <!-- 许可证警报 -->
       <template slot="licenses">
-        <highcharts :options="{
+        <highcharts
+          v-if="!(licensesOverview['not_in_rules'] === 0 
+            && licensesOverview['deny'] === 0 
+            && licensesOverview['flag'] === 0 
+            && licensesOverview['approve'] === 0)"
+          :options="{
           chart: {
             type: 'pie'
           },
@@ -158,7 +182,18 @@
           }
         }"></highcharts>
 
+        <span 
+          v-if="licensesOverview['not_in_rules'] === 0 
+            && licensesOverview['deny'] === 0 
+            && licensesOverview['flag'] === 0 
+            && licensesOverview['approve'] === 0"
+        >未发现问题</span>
+
         <b-table
+          v-if="!(licensesOverview['not_in_rules'] === 0 
+            && licensesOverview['deny'] === 0 
+            && licensesOverview['flag'] === 0 
+            && licensesOverview['approve'] === 0)"
           :fields="[
             { key: 'name', label: '名称' },
             { key: 'problem', label: '问题' },

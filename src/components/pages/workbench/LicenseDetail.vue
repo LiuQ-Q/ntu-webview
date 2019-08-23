@@ -152,11 +152,18 @@ export default {
     },
     async getIssuesLastAction() {
       this.$backend.scans.licenseIssues.getByIdMode(this.scanId, this.issueId, 'last-action').then(res => {
-        this.actionType = res['action_type'];
-        this.priority = res['priority'];
-        this.assignee = res['assignee'];
-        this.comment = res['comment'];
-        this.issueType = res['issue_type'];
+        if (JSON.stringify(res) === "{}") {
+          this.actionType = "none";
+          this.priority = "none";
+          this.assignee = "none";
+          this.issueType = "license";
+        } else {
+          this.actionType = res['action_type'];
+          this.priority = res['priority'];
+          this.assignee = res['assignee'];
+          this.comment = res['comment'];
+          this.issueType = res['issue_type'];
+        }
       });
 
     },

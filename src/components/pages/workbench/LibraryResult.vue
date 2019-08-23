@@ -22,8 +22,9 @@
 
       <template slot="vulnerabilities">
         <highcharts
-          v-if="scansOverview['total_scan_issues'] !== 0 && scansOverview['scan_issues_overview'] !== undefined"
+          v-if="scansOverview['vulnerable_libraries_count'] !== 0 && scansOverview['scan_issues_overview'] !== undefined"
           :options="{
+            credits: { enabled: false },
             chart: {
               type: 'pie'
             },
@@ -50,13 +51,14 @@
             }
           }"
         ></highcharts>
-        <span v-if="scansOverview['total_scan_issues'] === 0">未发现问题</span>
+        <span v-if="scansOverview['vulnerable_libraries_count'] === 0">未发现问题</span>
       </template>
 
       <template slot="licenses">
         <highcharts
           v-if="scansOverview['library_with_lic_issue'] !== 0 && scansOverview['license_issues_overview'] !== undefined"
           :options="{
+            credits: { enabled: false },
             chart: {
               type: 'pie'
             },
@@ -95,6 +97,7 @@
         {key: 'detail', label: '详情'},
       ]" 
       :items='scansLibrary'
+      class="library-result-table"
     >
       <template slot="thead-top">
         <tr>
@@ -104,7 +107,7 @@
           <th>
             <b-button
               size="sm"
-              v-if="scansById['lib_report_status'] !== 'N.A.'"
+              v-if="scansById['lib_report_status'] === 'Available'"
               @click="downloadRepo"
             >下载</b-button>
             <b-button
@@ -112,6 +115,11 @@
               v-if="scansById['lib_report_status'] === 'N.A.'"
               @click="exportRepo"
             >导出</b-button>
+            <b-button
+              size="sm"
+              v-if="scansById['lib_report_status'] === 'Generating'"
+              disabled
+            >导出中</b-button>
           </th>
           <th colspan="4"></th>
         </tr>  
@@ -204,6 +212,14 @@ export default {
       // 扫描详细信息
       this.$backend.scans.getById(this.scanId).then(res => {
         this.scansById = res;
+
+        console.log(res);
+        if (res['lib_report_status'] === 'Generating') {
+          // window.setTimeout(() => {
+            this.getScansById();
+          // }, 500);
+        }
+        
       });
     },
     // async getProjectById() {
@@ -231,6 +247,14 @@ export default {
 .library-result-overview {
   td {
     width: 33.33%;
+  }
+}
+.library-result-table {
+  td:nth-child(6) {
+    min-width: 60px;
+  }
+  td:nth-child(4) {
+    min-width: 60px;
   }
 }
 </style>

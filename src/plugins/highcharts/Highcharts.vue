@@ -17,7 +17,8 @@ export default {
   name: 'highcharts',
   data() {
     return {
-      chart: null
+      chart: null,
+      compareOptionStatus: true
     }
   },
   mounted() {
@@ -25,15 +26,36 @@ export default {
   },
   watch: {
     options: {
-      handler(val) {
-        this.chart.destroy();
-        this.initChart();
+      handler(val, oldVal) {
+
+        if (val.chart.type === "pie") {
+          this.compareOptions(val, oldVal);
+
+          if (!this.compareOptionStatus) {
+            this.chart.destroy();
+            this.initChart();
+            this.compareOptionStatus = true;
+          }
+        }
+
+        if (val.chart.type === "column") {
+          this.initChart();
+        }
       }
     }
   },
   methods: {
     initChart() {
       this.chart = new Highcharts.Chart(this.$el, this.options);
+    },
+    compareOptions(val, oldVal) {
+      val.series.forEach((serie, serieIndex) => {
+        serie.data.forEach((data, dataIndex) => {
+          if (data.toString() !== oldVal.series[serieIndex].data[dataIndex].toString()) {
+            this.compareOptionStatus = false;
+          }
+        })
+      });
     }
   }
 }

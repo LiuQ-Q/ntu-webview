@@ -39,7 +39,12 @@
     >
       <!-- 项目情况 -->
       <template slot="project">
-        <highcharts :options="{
+        <highcharts 
+          v-if="!(projectsOverview['never-scanned'] === 0 
+            && projectsOverview['outdated'] === 0 
+            && projectsOverview['up-to-date'] === 0)"
+        :options="{
+          credits: { enabled: false },
           chart: {
             type: 'pie'
           },
@@ -62,7 +67,15 @@
             showInLegend: true
           }
         }"></highcharts>
+        <span 
+          v-if="projectsOverview['never-scanned'] === 0 
+            && projectsOverview['outdated'] === 0 
+            && projectsOverview['up-to-date'] === 0"
+        >无项目</span>
         <b-table
+          v-if="!(projectsOverview['never-scanned'] === 0 
+            && projectsOverview['outdated'] === 0 
+            && projectsOverview['up-to-date'] === 0)"
           :fields="[
             { key: 'name', label: '名称' },
             { key: 'status', label: '状态' },
@@ -79,7 +92,7 @@
             slot="status" 
             slot-scope="data"
           >
-            <div :style="`color:${data.item.status === 'up_to_date' ? 'green' : (data.item.status === 'never_scanned' ? 'red' : '#F7A35C')};`">{{ projectStatus[data.item.status] }}</div>
+            <div :style="`color:${data.item.status === 'up-to-date' ? '#74DA5F' : (data.item.status === 'never-scanned' ? 'red' : '#F7A35C')};`">{{ projectStatus[data.item.status] }}</div>
           </template>
         </b-table>
       </template>
@@ -92,30 +105,31 @@
             && issuesCount['low'] === 0 
             && issuesCount['none'] === 0)"
           :options="{
-          chart: {
-            type: 'pie'
-          },
-          title: {
-            text: null
-          },
-          plotOptions: {
+            credits: { enabled: false },
+            chart: {
+              type: 'pie'
+            },
+            title: {
+              text: null
+            },
+            plotOptions: {
+              pie: {
+                showInLegend: true
+              }
+            },
+            series: [{
+              data: [
+                ['超高风险', issuesCount['critical']],
+                ['高风险', issuesCount['high']],
+                ['中等风险', issuesCount['medium']],
+                ['低风险', issuesCount['low']],
+                ['未知', issuesCount['none']],
+              ]
+            }],
             pie: {
               showInLegend: true
             }
-          },
-          series: [{
-            data: [
-              ['超高风险', issuesCount['critical']],
-              ['高风险', issuesCount['high']],
-              ['中等风险', issuesCount['medium']],
-              ['低风险', issuesCount['low']],
-              ['未知', issuesCount['none']],
-            ]
-          }],
-          pie: {
-            showInLegend: true
-          }
-        }"></highcharts>
+          }"></highcharts>
 
         <span 
           v-if="issuesCount['critical'] === 0 
@@ -158,29 +172,30 @@
             && licensesOverview['flag'] === 0 
             && licensesOverview['approve'] === 0)"
           :options="{
-          chart: {
-            type: 'pie'
-          },
-          title: {
-            text: null
-          },
-          plotOptions: {
+            credits: { enabled: false },
+            chart: {
+              type: 'pie'
+            },
+            title: {
+              text: null
+            },
+            plotOptions: {
+              pie: {
+                showInLegend: true
+              }
+            },
+            series: [{
+              data: [
+                ['未定义的', licensesOverview['not_in_rules']],
+                ['受限的', licensesOverview['deny']],
+                ['被标记的', licensesOverview['flag']],
+                ['被允许的', licensesOverview['approve']],
+              ]
+            }],
             pie: {
               showInLegend: true
             }
-          },
-          series: [{
-            data: [
-              ['未定义的', licensesOverview['not_in_rules']],
-              ['受限的', licensesOverview['deny']],
-              ['被标记的', licensesOverview['flag']],
-              ['被允许的', licensesOverview['approve']],
-            ]
-          }],
-          pie: {
-            showInLegend: true
-          }
-        }"></highcharts>
+          }"></highcharts>
 
         <span 
           v-if="licensesOverview['not_in_rules'] === 0 
@@ -224,9 +239,9 @@ export default {
       orgName: '',
       sourcecodeUsage: {},
       projectStatus: {
-        'never_scanned': '未扫描',
+        'never-scanned': '未扫描',
         'outdated': '未更新',
-        'up_to_date': '已更新',
+        'up-to-date': '已更新',
       },
       projectsOverview: {},
       projectList: [],
@@ -275,6 +290,7 @@ export default {
         this.projectList = res.results.filter(project => {
           return project['can_scan']
         });
+        console.log(this.projectList);
         
         this.projectList.forEach((result, index) => {
           if (result.latestCompletedScan) {

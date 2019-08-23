@@ -226,12 +226,15 @@ export default {
 					}
 				},
 				projects: {
-					create(orgId, name, teamId, description, provider) {
+					create(orgId, name, teamId, description, provider, projectType) {
 						return api.post(`/orgs/${orgId}/projects/`, {
+							activeOrgId: orgId,
 							name: name,
 							description: description || '',
 							team: teamId,
-							provider: provider
+							provider: provider,
+							organization_tag_ids: [],
+							type: projectType
 						}, Options()).then(transformData);
 					},
 					deleteById(orgId, projectId) {
@@ -500,8 +503,11 @@ export default {
 					return api.get(`/teams/${teamId}/`, Options()).then(transformData);
 				},
 				members: {
-					create(teamId) {
-						return api.post(`/teams/${teamId}/members/`, Options()).then(transformData);
+					create(teamId, memberId) {
+						return api.post(`/teams/${teamId}/members/`, {
+							org_member_id: memberId,
+							role: "member"
+						}, Options()).then(transformData);
 					},
 					deleteById(teamId, memberId) {
 						return api.delete(`/teams/${teamId}/members/${memberId}/`, Options()).then(transformData);
@@ -600,7 +606,7 @@ export default {
 				},
 				issues: {
 					download(scanId) {
-						downloadReport(scanId, `scan_${scanId}_library.pdf`, 'issues');						
+						downloadReport(scanId, `scan_${scanId}_issues.pdf`, 'issues');						
 					},
 					export(scanId) {
 						return api.get(`/scans/${scanId}/issues/export/`, Options({

@@ -35,7 +35,36 @@
             v-if="!projectById['can_scan']"
             @click="updateProject(projectId)"
           >取消隐藏</b-dropdown-item>
+          
+          <b-dropdown-item
+            v-if="projectById['can_scan']"
+            @click="$bvModal.show(`modalaa-scan-${projectById['name']}`)"
+          >扫描</b-dropdown-item>
         </b-dropdown>
+        <b-modal 
+          :id="`modalaa-scan-${projectById['name']}`"
+          hide-footer
+        >
+          <template slot="modal-title">扫描设置</template>
+
+          <p>项目名:&nbsp;{{ projectById['name'] }}</p>
+
+          <b-form-select
+            v-model="scanSetting"
+            size='sm'
+            class="mb-2"
+          >
+            <option value="source_code">源代码</option>
+            <option value="binary">二进制</option>
+          </b-form-select>
+
+          <b-button
+            size="sm"
+            class="mt-3" 
+            block
+            @click="beginScan(projectId, projectById['name'])"
+          >开始扫描</b-button>
+        </b-modal>
       </template>
 
       <template slot="scan">
@@ -127,10 +156,20 @@
       </template>
 
       <template slot="upload">
-        <p>已上传文件:&nbsp;{{ projectUploads['filename'] }}</p>
-        <p>文件大小:&nbsp;{{ Math.round(projectUploads['file_size'] * 100000) / 100 }}KB</p>
-        <p>上传者:&nbsp;{{ projectUploads['uploader_name'] }}</p>
-        <p>上传时间:&nbsp;{{ format(projectUploads['created']) }}</p>
+
+        <div v-if="Object.keys(projectUploads).length !== 0">
+          <p>已上传文件:&nbsp;{{ projectUploads['filename'] }}</p>
+          <p>文件大小:&nbsp;{{ Math.round(projectUploads['file_size'] * 100000) / 100 }}KB</p>
+          <p>上传者:&nbsp;{{ projectUploads['uploader_name'] }}</p>
+          <p>上传时间:&nbsp;{{ format(projectUploads['created']) }}</p>
+        </div>
+
+        <div v-if="projectUploads['filename'] === undefined">
+          <p>已上传文件:无</p>
+          <p>文件大小:0KB</p>
+          <p>上传者:无</p>
+          <p>上传时间:无</p>
+        </div>
 
         <b-button
           size="sm"
@@ -147,6 +186,12 @@
       </template>
     </b-table>
 
+    <b-progress
+      v-if="scanStatus"
+      animated
+      :value="scanPercentage"
+      :max="scanTotal"
+      class="mt-3"></b-progress>
     <b-table
       :fields="[
         { key: 'id', label: '编号' },
@@ -163,6 +208,7 @@
       :items="projectScans"
       class="text-center"
       small
+      :busy="isBusy"
     >
       <template slot="thead-top">
         <tr>
@@ -222,13 +268,17 @@
         slot-scope="data"
       >
         <b-link
-          v-if="data.item['status'] === 'finished' && data.item['vul_report_status'] !== 'N.A.'"
+          v-if="data.item['status'] === 'finished' && data.item['vul_report_status'] === 'Available'"
           @click="downloadRepo(data.item.id)"
         >下载</b-link>
         <b-link
           v-if="data.item['status'] === 'finished' && data.item['vul_report_status'] === 'N.A.'"
           @click="exportRepo(data.item.id)"
         >导出</b-link>
+        <b-link
+          disabled
+          v-if="data.item['status'] === 'finished' && data.item['vul_report_status'] === 'Generating'"
+        >导出中</b-link>
       </template>
 
       <template 
@@ -282,7 +332,12 @@ export default {
       },
       scansLog: {},
       policyName: '',
-      policyDesc: ''
+      policyDesc: '',
+      scanStatus: false,
+      scanPercentage: '',
+      scanTotal: 100,
+      isBusy: false,
+      scanSetting: 'binary',
     }
   },
   computed: {
@@ -315,15 +370,26 @@ export default {
       // 扫描历史列表
       this.$backend.projects.scans.getList(this.projectId).then(res => {
         this.projectScans = res.results;
+        
+        const status = res.results.find(project => {
+          return project.vul_report_status === 'Generating';
+        });
+
+        if (status) {
+          this.getProjectScans();
+        }
       });
-      // console.log(this.projectScans);
     },
     getProjectById() {
       // 项目信息
       this.$backend.projects.getById(this.projectId).then(res => {
         this.projectById = res;
+        // console.log(this.projectById);
+
+        if (res.lastScan !== null && res.lastScan.status === 'running') {
+          this.inspectScanningProject();
+        }
       });
-      // console.log(this.projectById);
     },
     getProjectScanPolicies() {
       // 扫描设置相关
@@ -367,9 +433,11 @@ export default {
     getProjectUploads() {
       // 上传文件相关
       this.$backend.projects.getByIdMode(this.projectId, 'uploads').then(res => {
-        this.projectUploads = res.results[0];
+        if (res.results.length !== 0) {
+          this.projectUploads = res.results[0];
+        }
+        // console.log(this.projectUploads);
       });
-      // console.log(this.projectUploads);
     },
     openScanStatus(scanId) {
       this.$backend.scans.getByIdMode(scanId, 'logs').then(res => {
@@ -414,11 +482,13 @@ export default {
       });
     },
     downloadRepo(scanId) {
-      Promise.all([
-        this.$backend.export.licenseIssues.download(scanId),
-        this.$backend.export.libraries.download(scanId),
-        this.$backend.export.issues.download(scanId),
-      ]);
+      this.$backend.export.licenseIssues.download(scanId)
+      window.setTimeout(() => {
+        this.$backend.export.libraries.download(scanId)
+      },1000)
+      window.setTimeout(() => {
+        this.$backend.export.issues.download(scanId)
+      },2000)
     },
     exportRepo(scanId) {
       Promise.all([
@@ -452,6 +522,45 @@ export default {
         this.getProjectUploads();
       });
     },
+    beginScan(projectId, projectName) {
+      this.$backend.projects.scans.create(projectId, this.scanSetting).then(res => {
+        this.$root.$emit('bv::hide::modal', `modalaa-scan-${projectName}`);
+
+        this.isBusy = true;
+        window.setTimeout(() => {
+          this.isBusy = false;
+          this.getProjectScans();
+          this.getProjectById();
+				}, 4000);
+      });
+    },
+    inspectScanningProject() {
+      this.$backend.projects.getById(this.projectId).then(res => {
+        const project = res;
+        if (project.lastScan !== null && res.lastScan.status === 'running') {
+          this.scanPercentage = project.lastScan['scan_percentage'];
+          this.scanStatus = true;
+          window.setTimeout(() =>{
+            this.inspectScanningProject()
+          }, 2000);
+        } else {
+          this.scanPercentage = 100;
+          window.setTimeout(() => {
+            this.$bvToast.toast('扫描完成', {
+              title: null,
+              variant: 'primary',
+              toaster: 'b-toaster-top-center',
+              autoHideDelay: 2000,
+              noCloseButton: true,
+              solid: true
+            });
+            
+            this.scanStatus = false;
+            this.getProjectScans();
+          }, 1000);
+        }
+      });
+    }
   }
 }
 </script>

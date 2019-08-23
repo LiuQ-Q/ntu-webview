@@ -22,6 +22,7 @@
 
       <template slot="vulnerabilities">
         <highcharts :options="{
+          credits: { enabled: false },
           chart: {
             type: 'pie'
           },
@@ -47,6 +48,12 @@
       </template>
     </b-table>
 
+    <b-progress
+      v-if="scanStatus"
+      animated
+      :value="scanPercentage"
+      :max="scanTotal"
+      class="mt-3"></b-progress>
     <b-table 
       :fields="[
         {key: 'name', label: '名称'},
@@ -58,6 +65,7 @@
         {key: 'manage', label: '操作'},
       ]" 
       :items="projectList"
+      :busy="isBusy"
       class="text-center"
     >
       <template slot="thead-top">
@@ -72,7 +80,12 @@
             >添加项目</b-button>
           </th>
           <th colspan="5">&nbsp;</th>
-        </tr>  
+        </tr>
+      </template>
+
+      <template slot="table-busy" class="text-center text-danger my-2">
+        <b-spinner class="align-middle"></b-spinner>
+        <strong>Loading...</strong>
       </template>
 
       <template 
@@ -108,7 +121,7 @@
         >{{ data.item.lastScan ? (data.item.lastScan.status === 'finished' ? '查看' : 'b') : 'a' }}</b-link>
 
         <span v-if="(data.item.lastScan ? (!(data.item.lastScan.status === 'finished')) : true)">
-          {{ data.item.lastScan ? (data.item.lastScan.status === 'failed' ? '失败' : '进行中') : '未扫描' }}
+          {{ data.item.lastScan ? (data.item.lastScan.status === 'failed' ? '失败' : (data.item.lastScan.status === 'queued' ? '排队中' : '进行中')) : '未扫描' }}
         </span>
       </template>
 
@@ -125,7 +138,7 @@
       >
         <b-button 
           size="sm"
-          :disabled="data.item.lastScan ? (data.item.lastScan.status === 'queued') : false"
+          :disabled="data.item.lastScan ? (data.item.lastScan.status === 'queued' || data.item.lastScan.status === 'running') : false"
           @click="$bvModal.show(`modalaa-scan-${data.item.name}`)"
         >开始扫描</b-button>
 
@@ -150,7 +163,7 @@
             size="sm"
             class="mt-3" 
             block
-            @click="beginScan(data.item.id)"
+            @click="beginScan(data.item.id, data.item.name)"
           >开始扫描</b-button>
         </b-modal>
       </template>
@@ -164,15 +177,19 @@ export default {
     return {
       orgId: this.$route.params.orgId,
       projectStatus: {
-        'never_scanned': '未扫描',
+        'never-scanned': '未扫描',
         'outdated': '未更新',
-        'up_to_date': '已更新',
+        'up-to-date': '已更新',
       },
-      scanSetting: 'source_code',
+      scanSetting: 'binary',
       projectsOverview: {},
       projectList: [],
       binaryUsage: {},
-      sourcecodeUsage: {}
+      sourcecodeUsage: {},
+      scanStatus: false,
+      scanPercentage: '',
+      scanTotal: 100,
+      isBusy: false
     }
   },
   mounted() {
@@ -186,10 +203,23 @@ export default {
       this.projectsOverview = await this.$backend.orgs.projects.getListMode(this.orgId, 'overview');
     },
     getProjectList() {
+      this.isBusy = true;
+
       this.$backend.orgs.projects.getList(this.orgId).then(res => {
+        this.isBusy = false;
         this.projectList = res.results.filter(project => {
           return project['can_scan']
         });
+
+        const scanningProject = this.projectList.filter(project => {
+          if (project.lastScan !== null) {
+            return project.lastScan.status === 'running';
+          }
+        });
+
+        if (scanningProject.length !== 0) {
+          this.inspectScanningProject();
+        }
       });
     },
     async getBinaryUsage() {
@@ -200,9 +230,54 @@ export default {
     async getSourcecodeUsage() {
       this.sourcecodeUsage = await this.$backend.orgs.sourcecodeUsage.getList(this.orgId);
     },
-    async beginScan(projectId) {
-      this.$backend.projects.scans.create(projectId, this.scanSetting);
+    beginScan(projectId, projectName) {
+      this.$backend.projects.scans.create(projectId, this.scanSetting).then(res => {
+        this.$root.$emit('bv::hide::modal', `modalaa-scan-${projectName}`);
+
+        this.isBusy = true;
+        window.setTimeout(() => {
+          this.isBusy = false;
+          this.getProjectList();
+				}, 4000);
+      });
     },
+    inspectScanningProject() {
+      this.$backend.orgs.projects.getList(this.orgId).then(res => {
+        const projectList = res.results.filter(project => {
+          return project['can_scan'];
+        });
+        
+        // console.log(projectList);
+        const scanningProject = projectList.filter(project => {
+          if (project.lastScan !== null) {
+            return project.lastScan.status === 'running';
+          }
+        });
+
+        if (scanningProject.length !== 0) {
+          this.scanPercentage = scanningProject[scanningProject.length - 1].lastScan['scan_percentage'];
+          this.scanStatus = true;
+          window.setTimeout(() =>{
+            this.inspectScanningProject()
+          }, 2000);
+        } else {
+          this.scanPercentage = 100;
+          window.setTimeout(() => {
+            this.$bvToast.toast('扫描完成', {
+              title: null,
+              variant: 'primary',
+              toaster: 'b-toaster-top-center',
+              autoHideDelay: 2000,
+              noCloseButton: true,
+              solid: true
+            });
+            
+            this.scanStatus = false;
+            this.getProjectList();
+          }, 800);
+        }
+      });
+    }
   }
 }
 </script>

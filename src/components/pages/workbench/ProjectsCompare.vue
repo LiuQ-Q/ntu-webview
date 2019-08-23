@@ -16,6 +16,7 @@
 			<template slot="problems">
 				<highcharts
 					:options="{
+						credits: { enabled: false },
 						chart: {
 							type: 'column'
 						},
@@ -36,6 +37,7 @@
 			<template slot="libraries">
 				<highcharts 
 					:options="{
+						credits: { enabled: false },
 						chart: {
 							type: 'column'
 						},
@@ -143,7 +145,7 @@ export default {
 				scan4: this.compareId[4],
 			})).results;
 
-			console.log(this.compareData);
+			// console.log(this.compareData);
 			
 		},
 		setCompareFields() {

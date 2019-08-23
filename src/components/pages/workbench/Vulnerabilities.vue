@@ -17,6 +17,7 @@
         <highcharts
           v-if="total.vul !== 0"
           :options="{
+            credits: { enabled: false },
             chart: {
               type: 'pie'
             },
@@ -50,6 +51,7 @@
         <highcharts
           v-if="total.cve !== 0"
           :options="{
+            credits: { enabled: false },
             chart: {
               type: 'pie'
             },
@@ -83,6 +85,7 @@
         <highcharts
           v-if="total.bug !== 0"
           :options="{
+            credits: { enabled: false },
             chart: {
               type: 'pie'
             },
@@ -116,6 +119,7 @@
         <highcharts
           v-if="total.vcc !== 0"
           :options="{
+            credits: { enabled: false },
             chart: {
               type: 'pie'
             },

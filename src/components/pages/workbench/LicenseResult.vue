@@ -24,7 +24,7 @@
           <th>
             <b-button
               size="sm"
-              v-if="scansById['lic_report_status'] !== 'N.A.'"
+              v-if="scansById['lic_report_status'] === 'Available'"
               @click="downloadRepo"
             >下载</b-button>
             <b-button
@@ -32,6 +32,11 @@
               v-if="scansById['lic_report_status'] === 'N.A.'"
               @click="exportRepo"
             >导出</b-button>
+            <b-button
+              size="sm"
+              v-if="scansById['lic_report_status'] === 'Generating'"
+              disabled
+            >导出中</b-button>
           </th>
           <th colspan="4">&nbsp;</th>
         </tr>  
@@ -79,14 +84,19 @@ export default {
       // 扫描详细信息
       this.$backend.scans.getById(this.scanId).then(res => {
         this.scansById = res;
+
+        if (res['lic_report_status'] === 'Generating') {
+          this.getScansById();
+        }
       });
     },
     downloadRepo() {
       this.$backend.export.licenseIssues.download(this.scanId);
     },
     exportRepo() {
-      this.$backend.export.licenseIssues.export(this.scanId);
-      this.getScansById();   
+      this.$backend.export.licenseIssues.export(this.scanId).then(res => {
+        this.getScansById();   
+      });
     },
   }
 }

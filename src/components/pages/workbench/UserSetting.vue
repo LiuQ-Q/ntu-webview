@@ -111,10 +111,10 @@ export default {
   },
   watch: {
     scanStatus() {
-      this.updateConfig(3, this.scanStatus);
+      this.updateConfig(1, this.scanStatus);
     },
     newVulnerability() {
-      this.updateConfig(4, this.newVulnerability);
+      this.updateConfig(2, this.newVulnerability);
     }
   },
   mounted() {

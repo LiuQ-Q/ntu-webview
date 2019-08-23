@@ -43,10 +43,22 @@
       :items="teamList"
       :fields="[
         { key: 'name', label: '名称' },
-        { key: 'description', label: '简介' }
+        { key: 'description', label: '简介' },
+        { key: 'action', label: '操作' },
       ]"
       bordered
     >
+      <template slot="name" slot-scope="data">
+        <b-link :to="`/workbench/1/settings/teams/${data.item.id}`">{{ data.item.name }}</b-link>
+      </template>
+
+      <template slot="action" slot-scope="data">
+        <b-button
+          v-if="data.item.id !== 1"
+          size="sm"
+          @click="deleteTeam(data.item.id)"
+        >移除</b-button>
+      </template>
     </b-table>
   </div>
 </template>
@@ -76,7 +88,7 @@ export default {
     getTeameList() {
       this.$backend.orgs.teams.getList(this.orgId).then(res => {
         this.teamList = res.results;
-        console.log(res);
+        // console.log(res);
         
       });
     },
@@ -85,6 +97,11 @@ export default {
         this.getTeameList();
         this.$refs['create-team'].hide();
       });
+    },
+    deleteTeam(id) {
+      this.$backend.orgs.teams.deleteById(this.orgId, id).then(res => {
+        this.getTeameList();
+      })
     }
   }
 }

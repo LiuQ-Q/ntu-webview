@@ -48,8 +48,14 @@ export default {
   methods: {
     createOrg() {
       this.$backend.orgs.create(this.orgName, this.orgDesc).then(res => {
-        console.log(res);
-        
+        this.$bvToast.toast('创建成功', {
+          title: null,
+          variant: 'primary',
+          toaster: 'b-toaster-top-center',
+          autoHideDelay: 2000,
+          noCloseButton: true,
+          solid: true
+        })
       });
     }
   }

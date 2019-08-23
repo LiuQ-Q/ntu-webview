@@ -22,6 +22,7 @@
         <highcharts
           v-if="vulTotalCount !== 0"
           :options="{
+            credits: { enabled: false },
             chart: {
               type: 'pie'
             },
@@ -55,6 +56,7 @@
         <highcharts
           v-if="licTotalCount !== 0"
           :options="{
+            credits: { enabled: false },
             chart: {
               type: 'pie'
             },
@@ -259,7 +261,11 @@ export default {
 }
 .libraries-by-library {
   td {
-    width: 13.5%;
+    width: 13%;
+
+    &:nth-child(8) {
+      min-width: 60px;
+    }
   }
 }
 </style>

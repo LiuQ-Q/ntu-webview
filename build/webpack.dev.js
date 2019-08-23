@@ -6,7 +6,7 @@ const axios = require('axios');
 const Koa = require('koa');
 const Router = require('koa-router');
 
-const NTU_BACKEND = 'http://52.82.100.75:8000';
+const NTU_BACKEND = 'http://39.100.239.154:8000';
 
 module.exports = merge(webpackBase, {
   mode: 'development',

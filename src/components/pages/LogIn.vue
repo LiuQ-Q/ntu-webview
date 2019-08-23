@@ -89,7 +89,8 @@
 export default {
   data() {
     return {
-      username: 'test1@scantist.com',
+      // username: 'test1@scantist.com',
+      username: '',
       password: '',
       orgId: '',
       newUsername: '',
@@ -124,6 +125,14 @@ export default {
         this.$router.push(`/workbench/${this.orgId}/dashboard`);
       } catch (error) {
         console.log(error)
+        this.$bvToast.toast('账号或密码错误!', {
+          title: null,
+          variant: 'danger',
+          toaster: 'b-toaster-top-center',
+          autoHideDelay: 2000,
+          noCloseButton: true,
+          solid: true
+        });
       }
     },
     logon() {

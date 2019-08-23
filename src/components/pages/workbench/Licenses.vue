@@ -23,6 +23,7 @@
         <highcharts
           v-if="licenseIssueTotal !== 0"
           :options="{
+            credits: { enabled: false },
             chart: {
               type: 'pie'
             },

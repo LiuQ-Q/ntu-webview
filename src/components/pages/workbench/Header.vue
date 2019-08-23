@@ -4,15 +4,15 @@
       type="dark" 
       variant="dark"
     >
-      <a href="/">
+      <!-- <a href="/">
         <img 
           src="../../../assets/img/logo.png" 
           class="rounded-circle mr-3" 
           style="width:40px;"
         >
-      </a>
+      </a> -->
 
-      <b-navbar-brand href="/" style="margin-right:0;">{{ $t('header') }}</b-navbar-brand>
+      <b-navbar-brand :to="`/workbench/${orgId}/dashboard`" style="margin-right:0;">{{ $t('header') }}</b-navbar-brand>
 
       <b-link
         v-for="(nav, index) in navs"
@@ -30,7 +30,7 @@
           <template slot="button-content">
             <i class="fas fa-user" style="color:#ddd;"></i>
           </template>
-          <b-dropdown-item to="user">用户设置</b-dropdown-item>
+          <b-dropdown-item :to="`/workbench/${orgId}/user`">用户设置</b-dropdown-item>
           <b-dropdown-item @click="logOut">退出</b-dropdown-item>
         </b-nav-item-dropdown>
         <!-- <b-nav-item-dropdown right style="float:right;">

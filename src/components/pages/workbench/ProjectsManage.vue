@@ -41,6 +41,18 @@
             </b-form-select>
           </b-form-group>
 
+          <b-form-group label="类型">
+            <b-form-select
+              v-model="projectType"
+              class="mb-2"
+            >
+
+              <option value="1">源代码</option>
+              <option value="2">二进制</option>
+
+            </b-form-select>
+          </b-form-group>
+
           <b-form-group label="简介:">
             <b-form-textarea
               rows="3"
@@ -67,6 +79,11 @@
           placeholder="选择文件..."
           drop-placeholder="将文件放在这..."
         ></b-form-file>
+        <b-button 
+          class="mt-3" 
+          block
+          @click="uploadFile"
+        >确定</b-button>
       </b-modal>
 
       <b-table
@@ -103,11 +120,14 @@
 </template>
 
 <script>
+import dateFormat from 'dateformat';
+
 export default {
   data() {
     return {
       projectName: '',
       projectTeam: '',
+      projectType: '',
       projectAbstract: '',
       file: {},
 
@@ -129,7 +149,9 @@ export default {
     getProjectList() {
       this.$backend.orgs.projects.getList(this.orgId).then(res => {
         this.projectList = res.results;
+      console.log(this.projectList);
       });
+      
     },
     getTeamList() {
       this.$backend.orgs.teams.getList(this.orgId).then(res => {
@@ -149,7 +171,7 @@ export default {
       });
     },
     createProject() {
-      this.$backend.orgs.projects.create(this.orgId, this.projectName, this.projectTeam, this.projectAbstract, 'upload').then(res => {
+      this.$backend.orgs.projects.create(this.orgId, this.projectName, this.projectTeam, this.projectAbstract, 'upload', this.projectType).then(res => {
         this.$refs['add-new-project'].hide();
         this.$refs['upload-file'].show();
       });
@@ -165,20 +187,23 @@ export default {
       const formData = new FormData();
       formData.append('file', this.file);
 
-      Promise.all([
-        this.$backend.upload.create(formData),
-        this.$backend.projects.uploads.create(this.projectId, this.file.name, fileModified, fileSize, this.file.name),
-        this.$backend.projects.uploads.getList(this.projectId)
-      ]).then(res => {
-        this.$bvToast.toast('文件上传成功', {
-          title: null,
-          variant: 'primary',
-          toaster: 'b-toaster-top-center',
-          autoHideDelay: 2000,
-          noCloseButton: true,
-          solid: true
-        })
-      });
+      this.$backend.upload.create(formData).then(res => {
+        this.$backend.orgs.projects.getList(this.orgId).then(res => {
+          this.$backend.projects.uploads.create(res.results[0].id, this.file.name, fileModified, fileSize, this.file.name).then(res => {
+            this.$bvToast.toast('文件上传成功', {
+              title: null,
+              variant: 'primary',
+              toaster: 'b-toaster-top-center',
+              autoHideDelay: 2000,
+              noCloseButton: true,
+              solid: true
+            });
+            this.$refs['upload-file'].hide();
+            this.getProjectList();
+          });
+        });
+      })
+
     },
   }
 }

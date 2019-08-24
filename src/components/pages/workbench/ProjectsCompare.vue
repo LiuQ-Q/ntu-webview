@@ -26,9 +26,6 @@
 						xAxis: {
 							categories: ['未知', '低风险', '中等风险', '高风险', '超高风险']
 						},
-						credits: {
-								enabled: false
-						},
 						series: problemsData
 					}"
 				></highcharts>
@@ -46,9 +43,6 @@
 						},
 						xAxis: {
 							categories: librariesCategory
-						},
-						credits: {
-								enabled: false
 						},
 						series: [
 							{
@@ -104,7 +98,7 @@ export default {
 			projectId: this.$route.params.projectId,
 			compareId: this.$route.params.compareId.split('&'),
 			compareData: []
-		}
+		};
 	},
 	mounted() {
 		this.setCompareFields();
@@ -114,7 +108,7 @@ export default {
 	methods: {
 		async getLibraryOverview() {
 			Promise.all(this.compareId.map((id) => {
-				return this.$backend.scans.libraries.getListMode(id, 'overview')
+				return this.$backend.scans.libraries.getListMode(id, 'overview');
 			})).then(res => {
 				res.forEach((ele, index) => {
 					this.problemsData.push({
@@ -131,8 +125,8 @@ export default {
 					this.librariesCategory.push(`Scan ${this.compareId[index]}`);
 
 					this.librariesData.push(ele['library_count']);
-				})
-			})
+				});
+			});
 		},
 		async getCompareData() {
 			this.compareData = (await this.$backend.orgs.scans.getByIdMode({
@@ -158,7 +152,7 @@ export default {
 		}
 
 	}
-}
+};
 </script>
 
 <style lang="less">

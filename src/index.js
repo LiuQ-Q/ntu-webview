@@ -23,11 +23,9 @@ import '@fortawesome/fontawesome-free/css/all.css';
 import 'js-polyfills/html';
 import 'js-polyfills/dom';
 
-
-
 new Vue({
-  router,
-  store,
-  i18n,
-  render: h => h(App),
+	router,
+	store,
+	i18n,
+	render: h => h(App),
 }).$mount('#app');

@@ -97,7 +97,7 @@ export default {
 						return api.get(`/issues/${issueId}/hunks/`, Options()).then(transformData);
 					},
 					getById(issueId, hunkId) {
-						return api.get(`/issues/${issueId}/hunks/${hunkId}`, Options()).then(transformData);
+						return api.get(`/issues/${issueId}/hunks/${hunkId}/`, Options()).then(transformData);
 					}
 				}
 			},
@@ -113,7 +113,7 @@ export default {
 						return api.get(`/library-versions/${libraryId}/issues/`, Options()).then(transformData);
 					},
 					getById(libraryId, issueId) {
-						return api.get(`/library-versions/${libraryId}/issues/${issueId}`, Options()).then(transformData);
+						return api.get(`/library-versions/${libraryId}/issues/${issueId}/`, Options()).then(transformData);
 					},
 				},
 			},
@@ -125,7 +125,7 @@ export default {
 					}, Options()).then(transformData);
 				},
 				deleteById(orgId) {
-					return api.delete(`/orgs/${orgId}`, Options()).then(transformData);
+					return api.delete(`/orgs/${orgId}/`, Options()).then(transformData);
 				},
 				updateById(orgId) {
 					return api.put(`/orgs/${orgId}/`, Options()).then(transformData);
@@ -184,7 +184,7 @@ export default {
 						return api.get(`/orgs/${orgId}/binary-usage/`, Options()).then(transformData);
 					},
 					getById(orgId, binaryUsageId) {
-						return api.get(`/orgs/${orgId}/binary-usage/${binaryUsageId}`, Options()).then(transformData);
+						return api.get(`/orgs/${orgId}/binary-usage/${binaryUsageId}/`, Options()).then(transformData);
 					}
 				},
 				issues: {

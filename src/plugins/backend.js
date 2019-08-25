@@ -73,7 +73,7 @@ export default {
 						_now: Date.now()
 					}
 				}).then(res => {
-					console.log(res)
+					console.log(res);
 					session.token = res.data.token;
 				});
 			},
@@ -173,7 +173,7 @@ export default {
 						return api.put(`/orgs/${orgId}/teams/${teamId}/`, Options()).then(transformData);
 					},
 					getList(orgId) {
-						return api.get(`/orgs/${orgId}/teams`, Options()).then(transformData);
+						return api.get(`/orgs/${orgId}/teams/`, Options()).then(transformData);
 					},
 					getById(orgId, teamId) {
 						return api.get(`/orgs/${orgId}/teams/${teamId}/`, Options()).then(transformData);
@@ -506,7 +506,7 @@ export default {
 					create(teamId, memberId) {
 						return api.post(`/teams/${teamId}/members/`, {
 							org_member_id: memberId,
-							role: "member"
+							role: 'member'
 						}, Options()).then(transformData);
 					},
 					deleteById(teamId, memberId) {
@@ -634,9 +634,9 @@ export default {
 					},
 				}
 			},
-		}
+		};
 	},
 	getOrgId: function() {
 		return api.get('/user/orgs/', Options()).then(transformData);
 	}
-}
+};

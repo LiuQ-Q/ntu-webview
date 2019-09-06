@@ -73,7 +73,7 @@ export default {
 						_now: Date.now()
 					}
 				}).then(res => {
-					console.log(res);
+					// console.log(res);
 					session.token = res.data.token;
 				});
 			},

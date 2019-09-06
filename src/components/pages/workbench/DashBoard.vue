@@ -290,7 +290,7 @@ export default {
 				this.projectList = res.results.filter(project => {
 					return project['can_scan'];
 				});
-				console.log(this.projectList);
+				// console.log(this.projectList);
 				
 				this.projectList.forEach((result) => {
 					if (result.latestCompletedScan) {

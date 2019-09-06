@@ -131,6 +131,9 @@
 			]"
 			:items='groupByLibrary'
 			class="libraries-by-library text-center"
+			id="classify-library-table"
+			:per-page="libraryPerPage"
+			:current-page="libraryCurrentPage"
 		>
 			<template slot="thead-top">
 				<h4>按组件分类</h4>
@@ -173,6 +176,15 @@
 			</template>
 
 		</b-table>
+
+		<b-pagination
+			v-model="libraryCurrentPage"
+			:total-rows="libraryRows"
+			:per-page="libraryPerPage"
+			aria-controls="classify-library-table"
+			align="center"
+			size="sm"
+		></b-pagination>
 	</b-container>
 </template>
 
@@ -201,12 +213,17 @@ export default {
 				flag: 0,
 				approve: 0
 			},
-			licTotalCount: 0
+			licTotalCount: 0,
+			libraryCurrentPage: 1,
+			libraryPerPage: 15,
 		};
 	},
 	computed: {
 		orgId() {
 			return this.$route.params.orgId;
+		},
+		libraryRows() {
+			return this.groupByLibrary.length;
 		}
 	},
 	mounted() {

@@ -198,6 +198,9 @@
 			]"
 			:items='groupByIssue'
 			class="vul-by-issue text-center"
+			id="classify-vul-table"
+			:per-page="vulPerPage"
+			:current-page="vulCurrentPage"
 		>
 			<template slot="thead-top">
 				<h4>按问题分类</h4>
@@ -227,6 +230,14 @@
 				</div>
 			</template>
 		</b-table>
+		<b-pagination
+			v-model="vulCurrentPage"
+			:total-rows="vulRows"
+			:per-page="vulPerPage"
+			aria-controls="classify-vul-table"
+			align="center"
+			size="sm"
+		></b-pagination>
 	</b-container>
 </template>
 
@@ -250,8 +261,15 @@ export default {
 				bug: 0,
 				cve: 0,
 				vcc: 0
-			}
+			},
+			vulCurrentPage: 1,
+			vulPerPage: 15,
 		};
+	},
+	computed: {
+		vulRows() {
+			return this.groupByIssue.length;
+		}
 	},
 	mounted() {
 		this.getIssuesOverview();

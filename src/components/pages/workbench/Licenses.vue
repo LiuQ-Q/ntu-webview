@@ -98,10 +98,13 @@
 				{ key: 'license_name', label: '描述' },
 				{ key: 'license_score', label: '得分' },
 				{ key: 'affect', label: '受影响项目' },
-				{ key: 'result', label: '受影响项目' },
+				{ key: 'result', label: '扫描结果' },
 			]"
 			:items='groupByLicense'
 			class="licenses-by-library text-center"
+			id="classify-license-table"
+			:per-page="licensePerPage"
+			:current-page="licenseCurrentPage"
 		>
 			<template slot="thead-top">
 				<h4>按许可证分类</h4>
@@ -127,10 +130,19 @@
 					v-for="(name, index) in data.item['project_names']"
 					:key="index"
 				>
-					<b-link :to="`projects/${data.item.projects[index]}/libraries/${data.item.scans[index]}`">查看</b-link>
+					<b-link :to="`projects/${data.item.projects[index]}/licenses/${data.item.scans[index]}`">查看</b-link>
 				</div>
 			</template>
 		</b-table>
+
+		<b-pagination
+			v-model="licenseCurrentPage"
+			:total-rows="licenseRows"
+			:per-page="licensePerPage"
+			aria-controls="classify-license-table"
+			align="center"
+			size="sm"
+		></b-pagination>
 	</b-container>
 </template>
 
@@ -142,8 +154,15 @@ export default {
 			licenseOverview: {},
 			licenseIssueTotal: 0,
 			projectByLicense: [],
-			groupByLicense: []
+			groupByLicense: [],
+			licenseCurrentPage: 1,
+			licensePerPage: 15,
 		};
+	},
+	computed: {
+		licenseRows() {
+			return this.groupByLicense.length;
+		}
 	},
 	mounted() {
 		this.getLicenseOverview();

@@ -98,6 +98,9 @@
 			]" 
 			:items='scansLibrary'
 			class="library-result-table"
+			id="library-result-table"
+			:per-page="libraryPerPage"
+			:current-page="libraryCurrentPage"
 		>
 			<template slot="thead-top">
 				<tr>
@@ -144,7 +147,7 @@
 			<template 
 				slot="licenses"
 				slot-scope="data"
-			>{{ data.item['library_version'].license.identifier }}</template>
+			>{{ data.item['library_version'].license !== null ? data.item['library_version'].license.identifier : '无' }}</template>
 
 			<template 
 				slot="detail"
@@ -153,6 +156,15 @@
 				<b-link :to="`${scanId}/issue/${data.item.id}`">查看</b-link>
 			</template>
 		</b-table>
+
+		<b-pagination
+			v-model="libraryCurrentPage"
+			:total-rows="libraryRows"
+			:per-page="libraryPerPage"
+			aria-controls="library-result-table"
+			align="center"
+			size="sm"
+		></b-pagination>
 	</b-container>
 </template>
 
@@ -188,8 +200,14 @@ export default {
 			scansById: {},
 			// projectById: {},
 			// scansLibraryGraph: {},
-			
+			libraryCurrentPage: 1,
+			libraryPerPage: 15,
 		};
+	},
+	computed: {
+		libraryRows() {
+			return this.scansLibrary.length;
+		}
 	},
 	mounted() {
 		this.getScansLibraryOverview();
@@ -207,13 +225,14 @@ export default {
 		async getScansLibrary() {
 			// 组件清单
 			this.scansLibrary = (await this.$backend.scans.libraries.getList(this.scanId)).results;
+			// console.log(this.scansLibrary);
 		},
 		getScansById() {
 			// 扫描详细信息
 			this.$backend.scans.getById(this.scanId).then(res => {
 				this.scansById = res;
 
-				console.log(res);
+				// console.log(res);
 				if (res['lib_report_status'] === 'Generating') {
 					// window.setTimeout(() => {
 					this.getScansById();

@@ -15,6 +15,9 @@
 			]" 
 			:items='licenseIssues'
 			class="license-result"
+			id="license-result-table"
+			:per-page="licensePerPage"
+			:current-page="licenseCurrentPage"
 		>
 			<template slot="thead-top">
 				<tr>
@@ -54,6 +57,15 @@
 				<b-link :to="`${scanId}/issue/${data.item.id}`">查看</b-link>
 			</template>
 		</b-table>
+
+		<b-pagination
+			v-model="licenseCurrentPage"
+			:total-rows="licenseRows"
+			:per-page="licensePerPage"
+			aria-controls="license-result-table"
+			align="center"
+			size="sm"
+		></b-pagination>
 	</b-container>
 </template>
 
@@ -69,8 +81,15 @@ export default {
 				Permissive: '允许的',
 				Restrictive: '受限的',
 			},
-			scansById: {}
+			scansById: {},
+			licenseCurrentPage: 1,
+			licensePerPage: 15,
 		};
+	},
+	computed: {
+		licenseRows() {
+			return this.licenseIssues.length;
+		}
 	},
 	mounted() {
 		this.getLicenseIssues();

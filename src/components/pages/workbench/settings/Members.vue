@@ -63,8 +63,7 @@ export default {
 		getMemberList() {
 			this.$backend.orgs.members.getList(this.orgId).then(res => {
 				this.memberList = res.results;
-				console.log(res);
-				
+				// console.log(res);
 			});
 		},
 		inviteMember() {

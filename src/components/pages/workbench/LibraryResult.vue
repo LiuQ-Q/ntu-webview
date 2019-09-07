@@ -107,6 +107,7 @@
 					<th>
 						<h5>组件清单</h5>
 					</th>
+					<th colspan="2"></th>
 					<th>
 						<b-button
 							size="sm"
@@ -124,7 +125,29 @@
 							disabled
 						>导出中</b-button>
 					</th>
-					<th colspan="4"></th>
+					<th>
+						<b-form-select 
+							v-if="scansById['lib_report_status'] === 'Available'"
+							v-model="reportFormat" 
+							:options="[
+								{ value: 'pdf', text: 'PDF' },
+								{ value: 'csv', text: 'CSV' },
+								{ value: 'json', text: 'JSON' },
+							]" 
+							size="sm" 
+						></b-form-select>
+					</th>
+					<th>
+						<b-form-select 
+							v-if="scansById['lib_report_status'] === 'Available' && reportFormat === 'pdf'"
+							v-model="reportLanguage" 
+							:options="[
+								{ value: 'chinese', text: '中文' },
+								{ value: 'english', text: '英文' },
+							]" 
+							size="sm" 
+						></b-form-select>
+					</th>
 				</tr>  
 			</template>
 
@@ -202,7 +225,16 @@ export default {
 			// scansLibraryGraph: {},
 			libraryCurrentPage: 1,
 			libraryPerPage: 15,
+			reportLanguage: 'chinese',
+			reportFormat: 'pdf'
 		};
+	},
+	watch: {
+		reportFormat(val, oldVal) {
+			if (val !== 'pdf') {
+				this.reportLanguage = 'english';
+			}
+		}
 	},
 	computed: {
 		libraryRows() {
@@ -234,9 +266,9 @@ export default {
 
 				// console.log(res);
 				if (res['lib_report_status'] === 'Generating') {
-					// window.setTimeout(() => {
-					this.getScansById();
-					// }, 500);
+					window.setTimeout(() => {
+						this.getScansById();
+					}, 1000);
 				}
 				
 			});
@@ -252,11 +284,17 @@ export default {
 		//   // console.log(this.scansLibraryGraph);
 		// },
 		downloadRepo() {
-			this.$backend.export.libraries.download(this.scanId);
+			this.$backend.export.libraries.download(this.scanId, this.reportLanguage, this.reportFormat);
 		},
 		exportRepo() {
-			this.$backend.export.libraries.export(this.scanId);
-			this.getScansById();   
+			Promise.all([
+				this.$backend.export.libraries.export(this.scanId, 'pdf', 'chinese'),
+				this.$backend.export.libraries.export(this.scanId, 'csv', 'english'),
+				this.$backend.export.libraries.export(this.scanId, 'xml', 'english'),
+				this.$backend.export.libraries.export(this.scanId, 'json', 'english'),
+			]).then(res => {
+				this.getScansById();   
+			});
 		},
 	}
 };

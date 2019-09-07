@@ -7,9 +7,9 @@ function transformData(res) {
 	return res.data;
 }
 
-function downloadReport(scanId, filename, reportType) {
+function downloadReport({ scanId, filename, reportType, language, format }) {
 	const downloadElement = document.createElement('a');
-	const url = `/mock/report/${scanId}/${filename}/${reportType}?token=${Cookies.get('NTU_Token')}`;
+	const url = `/mock/report/${scanId}/${filename}/${reportType}?token=${Cookies.get('NTU_Token')}&language=${language}&format=${format}`;
 
 	downloadElement.style.display = 'none';
 	downloadElement.href = url;
@@ -579,40 +579,58 @@ export default {
 			},
 			export: {
 				licenseIssues: {
-					download(scanId) {
-						downloadReport(scanId, `scan_${scanId}_license.pdf`, 'licenseissues');
+					download(scanId, language, format) {
+						downloadReport({
+							scanId: scanId, 
+							filename: `scan_${scanId}_license.${format}`,
+							reportType: 'licenseissues',
+							language: language,
+							format: format
+						});
 					},
-					export(scanId) {
+					export(scanId, format, language) {
 						return api.get(`/scans/${scanId}/licenseissues/export/`, Options({
 							params: {
-								language: 'chinese',
-								report_format: 'pdf'
+								language: language,
+								report_format: format
 							},
 						})).then(transformData);
 					},
 				},
 				libraries: {
-					download(scanId) {
-						downloadReport(scanId, `scan_${scanId}_library.pdf`, 'library-versions');
+					download(scanId, language, format) {
+						downloadReport({
+							scanId: scanId, 
+							filename: `scan_${scanId}_library.${format}`,
+							reportType: 'library-versions',
+							language: language,
+							format: format
+						});
 					},
-					export(scanId) {
+					export(scanId, format, language) {
 						return api.get(`/scans/${scanId}/library-versions/export/`, Options({
 							params: {
-								language: 'chinese',
-								report_format: 'pdf'
+								language: language,
+								report_format: format
 							},
 						})).then(transformData);
 					},
 				},
 				issues: {
-					download(scanId) {
-						downloadReport(scanId, `scan_${scanId}_issues.pdf`, 'issues');						
+					download(scanId, language, format) {
+						downloadReport({
+							scanId: scanId, 
+							filename: `scan_${scanId}_issues.${format}`,
+							reportType: 'issues',
+							language: language,
+							format: format
+						});
 					},
-					export(scanId) {
+					export(scanId, format, language) {
 						return api.get(`/scans/${scanId}/issues/export/`, Options({
 							params: {
-								language: 'chinese',
-								report_format: 'pdf'
+								language: language,
+								report_format: format
 							},
 						})).then(transformData);
 					},

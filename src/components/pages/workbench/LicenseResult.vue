@@ -41,7 +41,30 @@
 							disabled
 						>导出中</b-button>
 					</th>
-					<th colspan="4">&nbsp;</th>
+					<th>
+						<b-form-select 
+							v-if="scansById['lic_report_status'] === 'Available'"
+							v-model="reportFormat" 
+							:options="[
+								{ value: 'pdf', text: 'PDF' },
+								{ value: 'csv', text: 'CSV' },
+								{ value: 'json', text: 'JSON' },
+							]" 
+							size="sm" 
+						></b-form-select>
+					</th>
+					<th>
+						<b-form-select 
+							v-if="scansById['lic_report_status'] === 'Available' && reportFormat === 'pdf'"
+							v-model="reportLanguage" 
+							:options="[
+								{ value: 'chinese', text: '中文' },
+								{ value: 'english', text: '英文' },
+							]" 
+							size="sm" 
+						></b-form-select>
+					</th>
+					<th colspan="2">&nbsp;</th>
 				</tr>  
 			</template>
 
@@ -84,7 +107,16 @@ export default {
 			scansById: {},
 			licenseCurrentPage: 1,
 			licensePerPage: 15,
+			reportLanguage: 'chinese',
+			reportFormat: 'pdf'
 		};
+	},
+	watch: {
+		reportFormat(val, oldVal) {
+			if (val !== 'pdf') {
+				this.reportLanguage = 'english';
+			}
+		}
 	},
 	computed: {
 		licenseRows() {
@@ -105,15 +137,22 @@ export default {
 				this.scansById = res;
 
 				if (res['lic_report_status'] === 'Generating') {
-					this.getScansById();
+					window.setTimeout(() => {
+						this.getScansById();
+					},1000);
 				}
 			});
 		},
 		downloadRepo() {
-			this.$backend.export.licenseIssues.download(this.scanId);
+			this.$backend.export.licenseIssues.download(this.scanId, this.reportLanguage, this.reportFormat);
 		},
 		exportRepo() {
-			this.$backend.export.licenseIssues.export(this.scanId).then(res => {
+			Promise.all([
+				this.$backend.export.licenseIssues.export(this.scanId, 'pdf', 'chinese'),
+				this.$backend.export.licenseIssues.export(this.scanId, 'csv', 'english'),
+				this.$backend.export.licenseIssues.export(this.scanId, 'xml', 'english'),
+				this.$backend.export.licenseIssues.export(this.scanId, 'json', 'english'),
+			]).then(res => {
 				this.getScansById();   
 			});
 		},

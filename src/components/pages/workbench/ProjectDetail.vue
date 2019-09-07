@@ -216,6 +216,29 @@
 						<h5>扫描历史</h5>
 					</th>
 					<th colspan="8">&nbsp;</th>
+					<!-- <th>
+						<b-form-select 
+							v-if="scansById['lic_report_status'] === 'Available'"
+							v-model="reportFormat" 
+							:options="[
+								{ value: 'pdf', text: 'PDF' },
+								{ value: 'csv', text: 'CSV' },
+								{ value: 'json', text: 'JSON' },
+							]" 
+							size="sm" 
+						></b-form-select>
+					</th>
+					<th>
+						<b-form-select 
+							v-if="scansById['lic_report_status'] === 'Available' && reportFormat === 'pdf'"
+							v-model="reportLanguage" 
+							:options="[
+								{ value: 'chinese', text: '中文' },
+								{ value: 'english', text: '英文' },
+							]" 
+							size="sm" 
+						></b-form-select>
+					</th> -->
 					<th>
 						<b-button 
 							size="sm"
@@ -267,17 +290,39 @@
 				slot="report"
 				slot-scope="data"
 			>
-				<b-link
-					v-if="data.item['status'] === 'finished' && data.item['vul_report_status'] === 'Available'"
+				<!-- <b-link
+					v-if="data.item['status'] === 'finished' 
+						&& data.item['vul_report_status'] === 'Available'
+						&& data.item['lib_report_status'] === 'Available' 
+						&& data.item['lic_report_status'] === 'Available'"
 					@click="downloadRepo(data.item.id)"
-				>下载</b-link>
+				>下载</b-link> -->
+				<b-dropdown 
+					v-if="data.item['status'] === 'finished' 
+						&& data.item['vul_report_status'] === 'Available'
+						&& data.item['lib_report_status'] === 'Available' 
+						&& data.item['lic_report_status'] === 'Available'"
+					size="sm"
+					text="下载"
+				>
+					<b-dropdown-item @click="downloadRepo(data.item.id, 'pdf', 'chinese')">PDF(中文)</b-dropdown-item>
+					<b-dropdown-item @click="downloadRepo(data.item.id, 'pdf', 'english')">PDF(英文)</b-dropdown-item>
+					<b-dropdown-item @click="downloadRepo(data.item.id, 'csv', 'english')">CSV</b-dropdown-item>
+					<b-dropdown-item @click="downloadRepo(data.item.id, 'json', 'english')">JSON</b-dropdown-item>
+				</b-dropdown>
 				<b-link
-					v-if="data.item['status'] === 'finished' && data.item['vul_report_status'] === 'N.A.'"
+					v-if="data.item['status'] === 'finished' 
+						&& (data.item['vul_report_status'] === 'N.A.'
+							|| data.item['lib_report_status'] === 'N.A.'
+							|| data.item['lic_report_status'] === 'N.A.')"
 					@click="exportRepo(data.item.id)"
 				>导出</b-link>
 				<b-link
 					disabled
-					v-if="data.item['status'] === 'finished' && data.item['vul_report_status'] === 'Generating'"
+					v-if="data.item['status'] === 'finished' 
+					&& (data.item['vul_report_status'] === 'Generating' 
+						|| data.item['lib_report_status'] === 'Generating'
+						|| data.item['lic_report_status'] === 'Generating')"
 				>导出中</b-link>
 			</template>
 
@@ -481,20 +526,29 @@ export default {
 				this.getOrgsLicensePolicies();
 			});
 		},
-		downloadRepo(scanId) {
-			this.$backend.export.licenseIssues.download(scanId);
+		downloadRepo(scanId, reportFormat, reportLanguage) {
+			this.$backend.export.licenseIssues.download(scanId, reportLanguage, reportFormat);
 			window.setTimeout(() => {
-				this.$backend.export.libraries.download(scanId);
+				this.$backend.export.libraries.download(scanId, reportLanguage, reportFormat);
 			},1000);
 			window.setTimeout(() => {
-				this.$backend.export.issues.download(scanId);
+				this.$backend.export.issues.download(scanId, reportLanguage, reportFormat);
 			},2000);
 		},
 		exportRepo(scanId) {
 			Promise.all([
-				this.$backend.export.licenseIssues.export(scanId),
-				this.$backend.export.libraries.export(scanId),
-				this.$backend.export.issues.export(scanId),
+				this.$backend.export.licenseIssues.export(scanId, 'pdf', 'chinese'),
+				this.$backend.export.libraries.export(scanId, 'pdf', 'chinese'),
+				this.$backend.export.issues.export(scanId, 'pdf', 'chinese'),
+				this.$backend.export.licenseIssues.export(scanId, 'csv', 'english'),
+				this.$backend.export.libraries.export(scanId, 'csv', 'english'),
+				this.$backend.export.issues.export(scanId, 'csv', 'english'),
+				this.$backend.export.licenseIssues.export(scanId, 'xml', 'english'),
+				this.$backend.export.libraries.export(scanId, 'xml', 'english'),
+				this.$backend.export.issues.export(scanId, 'xml', 'english'),
+				this.$backend.export.licenseIssues.export(scanId, 'json', 'english'),
+				this.$backend.export.libraries.export(scanId, 'json', 'english'),
+				this.$backend.export.issues.export(scanId, 'json', 'english'),
 			]).then(res => {
 				this.getProjectScans();   
 			});

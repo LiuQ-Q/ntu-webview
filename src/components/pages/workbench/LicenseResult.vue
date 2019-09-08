@@ -17,7 +17,7 @@
 			class="license-result"
 			id="license-result-table"
 			:per-page="licensePerPage"
-			:current-page="licenseCurrentPage"
+			:busy="licenseIsBusy"
 		>
 			<template slot="thead-top">
 				<tr>
@@ -68,6 +68,23 @@
 				</tr>  
 			</template>
 
+			<template v-slot:table-busy>
+        <div class="text-center text-danger my-2">
+          <b-spinner class="align-middle"></b-spinner>
+          <strong>Loading...</strong>
+        </div>
+      </template>
+
+			<template 
+				slot="license_name"
+				slot-scope="data"
+			>{{ data.item['license_name'] === null ? '无' : data.item['license_name'] }}</template>
+
+			<template 
+				slot="license_score"
+				slot-scope="data"
+			>{{ data.item['license_score'] === null ? '无' : data.item['license_score'] }}</template>
+
 			<template 
 				slot="category"
 				slot-scope="data"
@@ -103,12 +120,15 @@ export default {
 			category: {
 				Permissive: '允许的',
 				Restrictive: '受限的',
+				null: '未知'
 			},
 			scansById: {},
+			reportLanguage: 'chinese',
+			reportFormat: 'pdf',
 			licenseCurrentPage: 1,
 			licensePerPage: 15,
-			reportLanguage: 'chinese',
-			reportFormat: 'pdf'
+			licenseRows: 0,
+			licenseIsBusy: false
 		};
 	},
 	watch: {
@@ -116,11 +136,9 @@ export default {
 			if (val !== 'pdf') {
 				this.reportLanguage = 'english';
 			}
-		}
-	},
-	computed: {
-		licenseRows() {
-			return this.licenseIssues.length;
+		},
+		licenseCurrentPage() {
+			this.getLicenseIssues();
 		}
 	},
 	mounted() {
@@ -129,12 +147,16 @@ export default {
 	},
 	methods: {
 		async getLicenseIssues() {
-			this.licenseIssues = (await this.$backend.scans.licenseIssues.getList(this.scanId)).results;
+			this.licenseIsBusy = true;
+			this.licenseIssues = (await this.$backend.scans.licenseIssues.getListPage(this.scanId, this.licenseCurrentPage, this.licensePerPage)).results;
+			this.licenseIsBusy = false;
+			// console.log(this.licenseIssues);
 		},
 		getScansById() {
 			// 扫描详细信息
 			this.$backend.scans.getById(this.scanId).then(res => {
 				this.scansById = res;
+				this.licenseRows = res['not_in_rules_count'] + res['approved_count'] + res['denied_count'] + res['flagged_count'];
 
 				if (res['lic_report_status'] === 'Generating') {
 					window.setTimeout(() => {

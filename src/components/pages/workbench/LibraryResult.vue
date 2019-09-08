@@ -100,7 +100,7 @@
 			class="library-result-table"
 			id="library-result-table"
 			:per-page="libraryPerPage"
-			:current-page="libraryCurrentPage"
+			:busy="libraryIsBusy"
 		>
 			<template slot="thead-top">
 				<tr>
@@ -150,6 +150,13 @@
 					</th>
 				</tr>  
 			</template>
+
+			<template v-slot:table-busy>
+        <div class="text-center text-danger my-2">
+          <b-spinner class="align-middle"></b-spinner>
+          <strong>Loading...</strong>
+        </div>
+      </template>
 
 			<template 
 				slot="name"
@@ -224,9 +231,11 @@ export default {
 			// projectById: {},
 			// scansLibraryGraph: {},
 			libraryCurrentPage: 1,
-			libraryPerPage: 15,
+			libraryPerPage: 20,
 			reportLanguage: 'chinese',
-			reportFormat: 'pdf'
+			reportFormat: 'pdf',
+			libraryRows: 0,
+			libraryIsBusy: false
 		};
 	},
 	watch: {
@@ -234,11 +243,9 @@ export default {
 			if (val !== 'pdf') {
 				this.reportLanguage = 'english';
 			}
-		}
-	},
-	computed: {
-		libraryRows() {
-			return this.scansLibrary.length;
+		},
+		libraryCurrentPage() {
+			this.getScansLibrary();
 		}
 	},
 	mounted() {
@@ -252,12 +259,15 @@ export default {
 		async getScansLibraryOverview() {
 			// 总览
 			this.scansOverview = await this.$backend.scans.libraries.getListMode(this.scanId, 'overview');
+			this.libraryRows = this.scansOverview['library_count'];
 			// console.log(this.scansOverview);
 		},
 		async getScansLibrary() {
+			this.libraryIsBusy = true;
 			// 组件清单
-			this.scansLibrary = (await this.$backend.scans.libraries.getList(this.scanId)).results;
+			this.scansLibrary = (await this.$backend.scans.libraries.getList(this.scanId, this.libraryCurrentPage, this.libraryPerPage)).results;
 			// console.log(this.scansLibrary);
+			this.libraryIsBusy = false;
 		},
 		getScansById() {
 			// 扫描详细信息
@@ -310,8 +320,11 @@ export default {
 	td:nth-child(6) {
 		min-width: 60px;
 	}
+	td:nth-child(5) {
+		min-width: 100px;
+	}
 	td:nth-child(4) {
-		min-width: 60px;
+		min-width: 100px;
 	}
 }
 </style>

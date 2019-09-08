@@ -133,11 +133,18 @@
 			class="libraries-by-library text-center"
 			id="classify-library-table"
 			:per-page="libraryPerPage"
-			:current-page="libraryCurrentPage"
+			:busy="libraryIsBusy"
 		>
 			<template slot="thead-top">
 				<h4>按组件分类</h4>
 			</template>
+
+			<template v-slot:table-busy>
+        <div class="text-center text-danger my-2">
+          <b-spinner class="align-middle"></b-spinner>
+          <strong>Loading...</strong>
+        </div>
+      </template>
 
 			<template 
 				slot="project_count"
@@ -215,15 +222,19 @@ export default {
 			},
 			licTotalCount: 0,
 			libraryCurrentPage: 1,
-			libraryPerPage: 15,
+			libraryPerPage: 20,
+			libraryRows: 0,
+			libraryIsBusy: false
 		};
 	},
 	computed: {
 		orgId() {
 			return this.$route.params.orgId;
 		},
-		libraryRows() {
-			return this.groupByLibrary.length;
+	},
+	watch: {
+		libraryCurrentPage() {
+			this.getgroupByLibrary();
 		}
 	},
 	mounted() {
@@ -254,11 +265,15 @@ export default {
 		getLibrarySummary() {
 			this.$backend.orgs.libraries.getListMode(this.orgId, 'library-version-summary').then(res => {
 				this.librarySummary = res;
+				// console.log(res);
+				this.libraryRows = res['library_versions_total'];
 			});
 		},
 		getgroupByLibrary() {
-			this.$backend.orgs.libraries.getListMode(this.orgId, 'group-by-library-versions').then(res => {
+			this.libraryIsBusy = true;
+			this.$backend.orgs.libraries.getListModePage(this.orgId, 'group-by-library-versions', this.libraryCurrentPage, this.libraryPerPage).then(res => {
 				this.groupByLibrary = res.results;
+				this.libraryIsBusy = false;
 			});
 		},
 	}

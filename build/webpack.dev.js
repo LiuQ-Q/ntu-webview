@@ -25,7 +25,7 @@ module.exports = merge(webpackBase, {
 				//     '^/api':''
 				// }
 			},
-			'/mock/report': {
+			'/mock': {
 				target: 'http://127.0.0.1:4000'
 			}
 		},
@@ -76,4 +76,6 @@ new Koa().use(new Router({
 	}
 	
 	ctx.set('Content-disposition', `attachment; filename=${filename}`);
+}).get('/restart', async ctx => {
+	ctx.body = '我重启啦!';
 }).routes()).listen(4000);

@@ -24,6 +24,11 @@ const api = axios.create({
 	headers: {}
 });
 
+const mock = axios.create({
+	baseURL: '/mock',
+	headers: {}
+});
+
 function Options(options = {}) {
 	if (!options.headers) {
 		options.headers = {};
@@ -80,6 +85,11 @@ export default {
 			logOut() {
 				api.post('/rest-auth/logout/', Options()).then(transformData);
 			},
+
+			restart() {
+				return mock.get('/restart', Options()).then(transformData);
+			},
+
 			issues: {
 				getList() {
 					return api.get('/issues/', Options()).then(transformData);
@@ -194,6 +204,14 @@ export default {
 					getListMode(orgId, mode) {
 						return api.get(`/orgs/${orgId}/issues/${mode}/`, Options()).then(transformData);
 					},
+					getListModePage(orgId, mode, page, limit) {
+						return api.get(`/orgs/${orgId}/issues/${mode}/`, Options({
+							params: {
+								page: page,
+								limit: limit
+							}
+						})).then(transformData);
+					},
 					getById(orgId, issueId) {
 						return api.get(`/orgs/${orgId}/issues/${issueId}/`, Options()).then(transformData);
 					}
@@ -209,6 +227,14 @@ export default {
 					},
 					getListMode(orgId, mode) {
 						return api.get(`/orgs/${orgId}/library-versions/${mode}/`, Options()).then(transformData);
+					},
+					getListModePage(orgId, mode, page, limit) {
+						return api.get(`/orgs/${orgId}/library-versions/${mode}/`, Options({
+							params: {
+								limit: limit,
+								page: page
+							}
+						})).then(transformData);
 					},
 					getById(orgId, libraryId) {
 						return api.get(`/orgs/${orgId}/library-versions/${libraryId}/`, Options()).then(transformData);
@@ -441,6 +467,14 @@ export default {
 					getList(scanId) {
 						return api.get(`/scans/${scanId}/issues/`, Options()).then(transformData);
 					},
+					getListPage(scanId, page, limit) {
+						return api.get(`/scans/${scanId}/issues/`, Options({
+							params: {
+								page:page,
+								limit: limit
+							}
+						})).then(transformData);
+					},
 					getListMode(scanId, mode) {
 						return api.get(`/scans/${scanId}/issues/${mode}/`, Options()).then(transformData);
 					},
@@ -449,8 +483,13 @@ export default {
 					}
 				},
 				libraries: {
-					getList(scanId) {
-						return api.get(`/scans/${scanId}/library-versions/`, Options()).then(transformData);
+					getList(scanId, page, limit) {
+						return api.get(`/scans/${scanId}/library-versions/`, Options({
+							params: {
+								limit: limit,
+								page: page
+							}
+						})).then(transformData);
 					},
 					getListMode(scanId, mode) {
 						return api.get(`/scans/${scanId}/library-versions/${mode}/`, Options()).then(transformData);
@@ -462,6 +501,14 @@ export default {
 				licenseIssues: {
 					getList(scanId) {
 						return api.get(`/scans/${scanId}/licenseissues/`, Options()).then(transformData);
+					},
+					getListPage(scanId, page, limit) {
+						return api.get(`/scans/${scanId}/licenseissues/`, Options({
+							params: {
+								page: page,
+								limit: limit
+							}
+						})).then(transformData);
 					},
 					getListMode(scanId, mode) {
 						return api.get(`/scans/${scanId}/licenseissues/${mode}/`, Options()).then(transformData);

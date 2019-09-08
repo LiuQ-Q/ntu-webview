@@ -105,10 +105,18 @@
 			id="classify-license-table"
 			:per-page="licensePerPage"
 			:current-page="licenseCurrentPage"
+			:busy="licenseIsBusy"
 		>
 			<template slot="thead-top">
 				<h4>按许可证分类</h4>
 			</template>
+
+			<template v-slot:table-busy>
+        <div class="text-center text-danger my-2">
+          <b-spinner class="align-middle"></b-spinner>
+          <strong>Loading...</strong>
+        </div>
+      </template>
 
 			<template 
 				slot="affect"
@@ -157,6 +165,7 @@ export default {
 			groupByLicense: [],
 			licenseCurrentPage: 1,
 			licensePerPage: 15,
+			licenseIsBusy: false
 		};
 	},
 	computed: {
@@ -179,7 +188,9 @@ export default {
 			this.projectByLicense = (await this.$backend.orgs.projects.getListMode(this.orgId, 'license-result-overview')).results;
 		},
 		async getGroupByLicense() {
+			this.licenseIsBusy = true;
 			this.groupByLicense = (await this.$backend.orgs.licenses.getListMode(this.orgId, 'group-by-licenses')).results;
+			this.licenseIsBusy = false;
 		}
 	}
 };

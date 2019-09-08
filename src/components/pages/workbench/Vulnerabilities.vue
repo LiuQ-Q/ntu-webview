@@ -200,11 +200,18 @@
 			class="vul-by-issue text-center"
 			id="classify-vul-table"
 			:per-page="vulPerPage"
-			:current-page="vulCurrentPage"
+			:busy="vulIsBusy"
 		>
 			<template slot="thead-top">
 				<h4>按问题分类</h4>
 			</template>
+
+			<template v-slot:table-busy>
+        <div class="text-center text-danger my-2">
+          <b-spinner class="align-middle"></b-spinner>
+          <strong>Loading...</strong>
+        </div>
+      </template>
 
 			<template 
 				slot="project_count"
@@ -264,11 +271,13 @@ export default {
 			},
 			vulCurrentPage: 1,
 			vulPerPage: 15,
+			vulIsBusy: false,
+			vulRows: 0
 		};
 	},
-	computed: {
-		vulRows() {
-			return this.groupByIssue.length;
+	watch: {
+		vulCurrentPage() {
+			this.getgroupByIssue();
 		}
 	},
 	mounted() {
@@ -279,7 +288,7 @@ export default {
 	methods: {
 		async getIssuesSummary() {
 			this.issuesSummary = await this.$backend.orgs.issues.getListMode(this.orgId, 'issue-summary');
-			
+
 			Object.keys(this.issuesSummary).forEach((key) => {
 				this.vulCount.none += this.issuesSummary[key].none;
 				this.vulCount.medium += this.issuesSummary[key].medium;
@@ -291,12 +300,15 @@ export default {
 			});
 
 			this.total.vul = this.total.bug + this.total.cve + this.total.vcc;
+			this.vulRows = this.total.vul;
 		},
 		async getIssuesOverview() {
 			this.issuesOverview = (await this.$backend.orgs.projects.getListMode(this.orgId, 'issue-overview')).results;
 		},
 		async getgroupByIssue() {
-			this.groupByIssue = (await this.$backend.orgs.issues.getListMode(this.orgId, 'group-by-issues')).results;
+			this.vulIsBusy = true;
+			this.groupByIssue = (await this.$backend.orgs.issues.getListModePage(this.orgId, 'group-by-issues', this.vulCurrentPage, this.vulPerPage)).results;
+			this.vulIsBusy = false;
 		}
 	}
 };

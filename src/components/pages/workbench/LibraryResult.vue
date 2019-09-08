@@ -123,7 +123,7 @@
 							size="sm"
 							v-if="scansById['lib_report_status'] === 'Generating'"
 							disabled
-						>导出中</b-button>
+						>导出中&nbsp;<b-spinner small variant="primary"></b-spinner></b-button>
 					</th>
 					<th>
 						<b-form-select 

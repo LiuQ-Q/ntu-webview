@@ -323,7 +323,7 @@
 					&& (data.item['vul_report_status'] === 'Generating' 
 						|| data.item['lib_report_status'] === 'Generating'
 						|| data.item['lic_report_status'] === 'Generating')"
-				>导出中</b-link>
+				>导出中&nbsp;<b-spinner small variant="primary"></b-spinner></b-link>
 			</template>
 
 			<template 
@@ -417,7 +417,9 @@ export default {
 				this.projectScans = res.results;
 				
 				const status = res.results.find(project => {
-					return project.vul_report_status === 'Generating';
+					return (project.vul_report_status === 'Generating' 
+						|| project.lib_report_status === 'Generating'
+						|| project.lic_report_status === 'Generating');
 				});
 
 				if (status) {
